@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preposition Master</title>
+<style>
+  /* ===== ПЕРЕМЕННЫЕ И СБРОС СТИЛЕЙ ===== */
+  :root {
+    --bg: #111113;
+    --bg-2: #1a1a1f;
+    --bg-3: #222228;
+    --text: #e8e8f0;
+    --text-muted: #888899;
+    --accent: #7c6cf0;
+    --accent-hover: #9485f5;
+    --accent-dim: rgba(124, 108, 240, 0.15);
+    --correct: #4caf7d;
+    --correct-dim: rgba(76, 175, 125, 0.18);
+    --wrong: #e05c6e;
+    --wrong-dim: rgba(224, 92, 110, 0.18);
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.16);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: 0.2s ease;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ===== ЗЕРНОВАЯ ТЕКСТУРА ФОНА ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ===== ЭКРАНЫ ===== */
+  .screen {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== ГЛАВНЫЙ ЭКРАН ===== */
+  .home-header {
+    text-align: center;
+    padding: 4rem 0 3rem;
+  }
+
+  .logo-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(124,108,240,0.25);
+  }
+
+  .home-title {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #e8e8f0 30%, #a89cf0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.75rem;
+  }
+
+  .home-subtitle {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 460px;
+    margin: 0 auto 0.5rem;
+  }
+
+  /* ===== СЕТКА БУКВ ===== */
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .letter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+    gap: 10px;
+    margin-bottom: 4rem;
+  }
+
+  .letter-btn {
+    aspect-ratio: 1;
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 1.3rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .letter-btn .count {
+    font-size: 9px;
+    font-weight: 400;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .letter-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(124,108,240,0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+
+  .letter-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(124,108,240,0.2);
+  }
+
+  .letter-btn:hover:not(:disabled)::after { opacity: 1; }
+
+  .letter-btn:disabled {
+    opacity: 0.28;
+    cursor: not-allowed;
+  }
+
+  .letter-btn:active:not(:disabled) { transform: translateY(-1px); }
+
+  /* ===== ЭКРАН ТЕСТА ===== */
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+  }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all var(--transition);
+  }
+
+  .back-btn:hover {
+    border-color: var(--border-hover);
+    color: var(--text);
+  }
+
+  .quiz-meta {
+    text-align: right;
+  }
+
+  .quiz-letter-badge {
+    display: inline-block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    width: 48px;
+    height: 48px;
+    background: var(--accent-dim);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(124,108,240,0.25);
+  }
+
+  /* ===== СЧЁТЧИК ОЧКОВ ===== */
+  .score-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .score-item {
+    flex: 1;
+    text-align: center;
+  }
+
+  .score-num {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .score-num.correct-color { color: var(--correct); }
+  .score-num.wrong-color { color: var(--wrong); }
+  .score-num.total-color { color: var(--accent); }
+
+  .score-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+  }
+
+  /* ===== ВОПРОС ===== */
+  .question-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .question-category {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1.2rem;
+  }
+
+  .question-word {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .question-blank {
+    display: inline-block;
+    min-width: 60px;
+    border-bottom: 3px solid var(--accent);
+    color: transparent;
+    vertical-align: bottom;
+    margin: 0 4px;
+  }
+
+  /* ===== КНОПКИ ОТВЕТОВ ===== */
+  .answers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    .answers-grid { grid-template-columns: 1fr; }
+  }
+
+  .answer-btn {
+    padding: 1rem 1.25rem;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    letter-spacing: 0.02em;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .answer-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(124,108,240,0.15);
+  }
+
+  .answer-btn:active:not(:disabled) { transform: translateY(0); }
+
+  .answer-btn.correct {
+    background: var(--correct-dim);
+    border-color: var(--correct);
+    color: var(--correct);
+    animation: pulse-correct 0.4s ease;
+  }
+
+  .answer-btn.wrong {
+    background: var(--wrong-dim);
+    border-color: var(--wrong);
+    color: var(--wrong);
+    animation: shake 0.4s ease;
+  }
+
+  .answer-btn:disabled { cursor: not-allowed; }
+
+  @keyframes pulse-correct {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  /* ===== КНОПКА ДАЛЕЕ ===== */
+  .next-btn {
+    display: none;
+    width: 100%;
+    padding: 1rem;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    letter-spacing: 0.04em;
+    margin-top: 0.5rem;
+  }
+
+  .next-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .next-btn.visible { display: block; }
+
+  /* ===== СТРИК УВЕДОМЛЕНИЕ ===== */
+  .streak-notice {
+    text-align: center;
+    padding: 0.75rem;
+    background: var(--correct-dim);
+    border: 1px solid rgba(76,175,125,0.3);
+    border-radius: var(--radius-sm);
+    color: var(--correct);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .streak-notice.show { display: block; }
+
+  /* ===== АДАПТИВНОСТЬ ===== */
+  @media (max-width: 600px) {
+    .question-card { padding: 1.75rem 1.25rem; }
+    .quiz-header { flex-wrap: wrap; gap: 1rem; }
+  }
+
+  /* ===== ПОЛОСКА ПРОГРЕССА ===== */
+  .streak-bar-wrap {
+    height: 3px;
+    background: var(--bg-3);
+    border-radius: 2px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  .streak-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--correct), var(--accent));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* ===== ПОДСКАЗКА В ВОПРОСЕ ===== */
+  .hint-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===================== ГЛАВНЫЙ ЭКРАН ===================== -->
+  <div id="screen-home" class="screen active">
+    <div class="home-header">
+      <div class="logo-tag">ЦТ Prep · Английский</div>
+      <h1 class="home-title">Preposition<br>Master</h1>
+      <p class="home-subtitle">Выбери букву и тренируй предлоги и фразовые глаголы в режиме бесконечного теста</p>
+    </div>
+
+    <p class="section-label">Выбери букву алфавита</p>
+    <div class="letter-grid" id="letter-grid"></div>
+  </div>
+
+  <!-- ===================== ЭКРАН ТЕСТА ===================== -->
+  <div id="screen-quiz" class="screen">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="goHome()">← На главную</button>
+      <div class="quiz-letter-badge" id="quiz-letter-badge">A</div>
+    </div>
+
+    <!-- Счётчик очков -->
+    <div class="score-bar">
+      <div class="score-item">
+        <span class="score-num correct-color" id="score-correct">0</span>
+        <span class="score-label">Верно</span>
+      </div>
+      <div class="score-item">
+        <span class="score-num wrong-color" id="score-wrong">0</span>
+        <span class="score-label">Ошибок</span>
+      </div>
+      <div class="score-item">
+        <span class="score-num total-color" id="score-streak">0</span>
+        <span class="score-label">Стрик 🔥</span>
+      </div>
+    </div>
+
+    <!-- Прогресс-бар стрика -->
+    <div class="streak-bar-wrap">
+      <div class="streak-bar-fill" id="streak-bar"></div>
+    </div>
+
+    <!-- Стрик-уведомление -->
+    <div class="streak-notice" id="streak-notice">🔥 Отличная серия!</div>
+
+    <!-- Карточка вопроса -->
+    <div class="question-card">
+      <p class="question-category" id="q-category">Глагол</p>
+      <div class="question-word" id="q-word">depend _____</div>
+      <p class="hint-text" id="q-hint"></p>
+    </div>
+
+    <!-- Варианты ответов -->
+    <div class="answers-grid" id="answers-grid"></div>
+
+    <!-- Кнопка далее (при ошибке) -->
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Следующее слово →</button>
+  </div>
+
+</div>
+
+<script>
+/* =================================================================
+   БАЗА ДАННЫХ ПРЕДЛОГОВ
+   Формат каждой записи:
+   {
+     word: "слово или фраза с _____",
+     preposition: "правильный предлог",
+     hint: "подсказка или перевод" (необязательно),
+     category: "verb" | "adj" | "noun" | "phrase"
+   }
+
+   Добавляй слова в соответствующий массив буквы.
+   Каждая буква = отдельный массив в объекте DATA.
+   ================================================================= */
+
+const DATA = {
+
+  /* ===== A ===== */
+  A: [
+    // Глаголы
+    { word: "admire sb _____ sth", preposition: "for", hint: "восхищаться чем-то", category: "verb" },
+    { word: "apologize _____ sb for sth", preposition: "to", hint: "извиняться перед кем-то", category: "verb" },
+    { word: "aim _____", preposition: "at", hint: "нацеливаться", category: "verb" },
+    { word: "arrive _____", preposition: "in", hint: "приехать (в город/страну)", category: "verb" },
+    { word: "arrive _____", preposition: "at", hint: "приехать (на станцию/аэропорт)", category: "verb" },
+    { word: "approve _____", preposition: "of", hint: "одобрять", category: "verb" },
+    { word: "apply to sb _____ sth", preposition: "for", hint: "обращаться", category: "verb" },
+    { word: "agree _____ sb", preposition: "with", hint: "соглашаться с кем-то", category: "verb" },
+    { word: "agree _____ sth", preposition: "on", hint: "договариваться о чем-то", category: "verb" },
+    { word: "associate _____", preposition: "with", hint: "ассоциироваться", category: "verb" },
+    { word: "appeal _____", preposition: "to", hint: "обращаться, привлекать", category: "verb" },
+    { word: "accuse _____", preposition: "of", hint: "обвинять", category: "verb" },
+    { word: "ask _____", preposition: "for", hint: "просить", category: "verb" },
+    { word: "ask _____", preposition: "about", hint: "спрашивать о", category: "verb" },
+    { word: "argue with sb _____ sth", preposition: "about", hint: "спорить о чём-то", category: "verb" },
+    // Существительные
+    { word: "access _____", preposition: "to", hint: "доступ к", category: "noun" },
+    { word: "advantage _____", preposition: "of", hint: "преимущество", category: "noun" },
+    { word: "advertisement _____", preposition: "for", hint: "объявление", category: "noun" },
+    { word: "advice _____", preposition: "on", hint: "совет", category: "noun" },
+    { word: "attitude _____", preposition: "to", hint: "отношение к", category: "noun" },
+    { word: "ability _____", preposition: "in", hint: "способность в", category: "noun" },
+    // Прилагательные
+    { word: "accompanied _____", preposition: "by", hint: "в сопровождении", category: "adj" },
+    { word: "addicted _____", preposition: "to", hint: "зависимый", category: "adj" },
+    { word: "amazed _____", preposition: "at", hint: "удивленный", category: "adj" },
+    { word: "astonished _____", preposition: "at", hint: "удивленный", category: "adj" },
+    { word: "accustomed _____", preposition: "to", hint: "привыкший", category: "adj" },
+    { word: "afraid _____", preposition: "of", hint: "бояться", category: "adj" },
+    { word: "angry _____ sb", preposition: "with", hint: "злиться на кого-то", category: "adj" },
+    { word: "angry _____ sth", preposition: "about", hint: "злиться по поводу чего-то", category: "adj" },
+    { word: "acquainted _____", preposition: "with", hint: "знаком с", category: "adj" },
+    { word: "ashamed _____", preposition: "of", hint: "стыдиться", category: "adj" },
+    { word: "aware _____", preposition: "of", hint: "осведомленный", category: "adj" },
+    { word: "absorbed _____", preposition: "in", hint: "поглощенный", category: "adj" },
+    { word: "allergic _____", preposition: "to", hint: "с аллергией на", category: "adj" },
+    { word: "anxious _____", preposition: "about", hint: "встревоженный", category: "adj" },
+    { word: "attached _____", preposition: "to", hint: "прикрепленный, привязан", category: "adj" },
+    { word: "absent _____", preposition: "from", hint: "отсутствующий", category: "adj" },
+    // Полезные фразы
+    { word: "according _____", preposition: "to", hint: "в соответствии с", category: "phrase" },
+    { word: "in addition _____", preposition: "to", hint: "в добавок", category: "phrase" },
+    { word: "on _____", preposition: "average", hint: "в среднем", category: "phrase" },
+    { word: "ahead _____", preposition: "of", hint: "впереди", category: "phrase" },
+    { word: "in _____", preposition: "advance", hint: "заранее", category: "phrase" },
+    { word: "apart _____", preposition: "from", hint: "кроме", category: "phrase" },
+  ],
+
+  /* ===== B ===== */
+  B: [
+    // Глаголы
+    { word: "belong _____", preposition: "to", hint: "принадлежать", category: "verb" },
+    { word: "benefit _____", preposition: "from", hint: "получать выгоду от", category: "verb" },
+    { word: "blame _____ sb/sth", preposition: "on", hint: "винить кого-то", category: "verb" },
+    { word: "blame _____ sth", preposition: "for", hint: "винить в чем-то", category: "verb" },
+    { word: "borrow _____", preposition: "from", hint: "брать в долг у кого-то", category: "verb" },
+    { word: "begin _____", preposition: "with", hint: "начинать с", category: "verb" },
+    { word: "believe _____", preposition: "in", hint: "верить в", category: "verb" },
+    { word: "boast _____", preposition: "of", hint: "хвастаться", category: "verb" },
+    { word: "bump _____", preposition: "into", hint: "врезаться в", category: "verb" },
+    { word: "border _____", preposition: "on", hint: "граничить с", category: "verb" },
+    // Существительные
+    { word: "put/lay the blame _____ sb/sth", preposition: "on", hint: "перекладывать вину на", category: "noun" },
+    // Прилагательные
+    { word: "bad _____", preposition: "at", hint: "плох в", category: "adj" },
+    { word: "based _____", preposition: "on", hint: "основан на", category: "adj" },
+    { word: "bored _____ sth", preposition: "with", hint: "утомленный чем-то", category: "adj" },
+    { word: "brilliant _____", preposition: "at", hint: "хорош в", category: "adj" },
+    { word: "busy _____", preposition: "with", hint: "занят чем-то", category: "adj" },
+    { word: "born into a _____ family", preposition: "rich", hint: "родиться в семье", category: "adj" },
+    // Фразы
+    { word: "in _____", preposition: "brief", hint: "коротко", category: "phrase" },
+    { word: "in the _____", preposition: "beginning", hint: "изначально", category: "phrase" },
+    { word: "at _____", preposition: "breakfast", hint: "за завтраком", category: "phrase" },
+    { word: "for _____", preposition: "breakfast", hint: "на завтрак", category: "phrase" },
+    { word: "in _____", preposition: "bed", hint: "в кровати", category: "phrase" },
+    { word: "on behalf _____", preposition: "of", hint: "от лица", category: "phrase" },
+    { word: "on _____", preposition: "balance", hint: "в целом, в общем", category: "phrase" },
+    { word: "by _____", preposition: "bus", hint: "на автобусе", category: "phrase" },
+    { word: "on the _____", preposition: "beach", hint: "на пляже", category: "phrase" },
+    { word: "on _____", preposition: "business", hint: "по работе", category: "phrase" },
+  ],
+
+  /* ===== C ===== */
+  C: [
+    // Глаголы
+    { word: "care _____", preposition: "about", hint: "заботиться о", category: "verb" },
+    { word: "care _____", preposition: "for", hint: "проявлять любовь, хотеть", category: "verb" },
+    { word: "charge _____", preposition: "for", hint: "взимать плату за", category: "verb" },
+    { word: "charge _____ with", preposition: "with", hint: "обвинить в", category: "verb" },
+    { word: "comment _____", preposition: "on", hint: "комментировать", category: "verb" },
+    { word: "compliment _____", preposition: "on", hint: "сделать комплимент", category: "verb" },
+    { word: "congratulate _____", preposition: "on", hint: "поздравлять с", category: "verb" },
+    { word: "concentrate _____", preposition: "on", hint: "концентрироваться на", category: "verb" },
+    { word: "communicate _____", preposition: "with", hint: "общаться с", category: "verb" },
+    { word: "consist _____", preposition: "of", hint: "состоять из", category: "verb" },
+    { word: "contribute _____", preposition: "to", hint: "делать вклад", category: "verb" },
+    { word: "cope _____", preposition: "with", hint: "справляться с", category: "verb" },
+    { word: "choose _____", preposition: "from", hint: "выбирать из", category: "verb" },
+    { word: "complain _____ sb", preposition: "to", hint: "жаловаться кому-то", category: "verb" },
+    { word: "complain _____ sth", preposition: "about", hint: "жаловаться на что-то", category: "verb" },
+    { word: "come _____", preposition: "from", hint: "происходить", category: "verb" },
+    { word: "compare _____ with", preposition: "to", hint: "сравнивать", category: "verb" },
+    { word: "cure _____", preposition: "of", hint: "лечить от", category: "verb" },
+    // Существительные
+    { word: "cause _____", preposition: "of", hint: "причина", category: "noun" },
+    { word: "cheque _____", preposition: "for", hint: "чек на", category: "noun" },
+    { word: "cure _____", preposition: "for", hint: "лекарство", category: "noun" },
+    // Прилагательные
+    { word: "capable _____", preposition: "of", hint: "способный", category: "adj" },
+    { word: "certain _____", preposition: "of", hint: "уверен", category: "adj" },
+    { word: "characteristic _____", preposition: "of", hint: "типичный для", category: "adj" },
+    { word: "clever _____", preposition: "at", hint: "умен в", category: "adj" },
+    { word: "covered _____", preposition: "with", hint: "покрытый", category: "adj" },
+    { word: "crazy _____", preposition: "about", hint: "сильно увлечен", category: "adj" },
+    { word: "crowded _____", preposition: "with", hint: "заполнен людьми", category: "adj" },
+    { word: "cruel _____", preposition: "to", hint: "жесток к", category: "adj" },
+    { word: "curious _____", preposition: "about", hint: "любознательный", category: "adj" },
+    { word: "conscious _____", preposition: "of", hint: "осознающий", category: "adj" },
+    { word: "concerned _____", preposition: "about", hint: "обеспокоенный", category: "adj" },
+    { word: "confused _____", preposition: "about", hint: "растерянный", category: "adj" },
+    // Фразы
+    { word: "by _____", preposition: "chance", hint: "случайно", category: "phrase" },
+    { word: "in charge _____", preposition: "of", hint: "во главе", category: "phrase" },
+    { word: "free _____", preposition: "of", hint: "бесплатный", category: "phrase" },
+    { word: "close _____", preposition: "to", hint: "рядом с", category: "phrase" },
+    { word: "in comparison _____", preposition: "with", hint: "в сравнении с", category: "phrase" },
+    { word: "in contact _____", preposition: "with", hint: "на связи с", category: "phrase" },
+    { word: "contrary _____", preposition: "to", hint: "вопреки", category: "phrase" },
+    { word: "on the _____", preposition: "contrary", hint: "наоборот", category: "phrase" },
+    { word: "in _____", preposition: "cash", hint: "наличными", category: "phrase" },
+    { word: "by _____", preposition: "card", hint: "картой", category: "phrase" },
+    { word: "in _____", preposition: "common", hint: "иметь общее", category: "phrase" },
+    { word: "in _____", preposition: "conclusion", hint: "в заключении", category: "phrase" },
+    { word: "in the _____", preposition: "country", hint: "за городом", category: "phrase" },
+    { word: "in the _____", preposition: "centre", hint: "в центре", category: "phrase" },
+    { word: "on the _____", preposition: "coast", hint: "на побережье", category: "phrase" },
+    { word: "under _____", preposition: "control", hint: "под контролем", category: "phrase" },
+    { word: "in _____", preposition: "class", hint: "на уроке, в школе", category: "phrase" },
+  ],
+
+  /* ===== D ===== */
+  D: [
+    // Глаголы
+    { word: "date _____", preposition: "from", hint: "датироваться", category: "verb" },
+    { word: "demand _____ sb", preposition: "from", hint: "требовать от", category: "verb" },
+    { word: "deal _____", preposition: "with", hint: "иметь дело с", category: "verb" },
+    { word: "decide _____", preposition: "on", hint: "сделать выбор", category: "verb" },
+    { word: "dedicate _____", preposition: "to", hint: "посвятить", category: "verb" },
+    { word: "devote _____", preposition: "to", hint: "посвятить", category: "verb" },
+    { word: "depart _____", preposition: "from", hint: "уезжать из", category: "verb" },
+    { word: "depend _____", preposition: "on", hint: "зависеть от", category: "verb" },
+    { word: "die _____", preposition: "of", hint: "умереть от (болезнь)", category: "verb" },
+    { word: "disagree _____", preposition: "with", hint: "не согласиться", category: "verb" },
+    { word: "disapprove _____", preposition: "of", hint: "не одобрять", category: "verb" },
+    { word: "dream _____", preposition: "about", hint: "снить", category: "verb" },
+    { word: "dream _____", preposition: "of", hint: "мечтать", category: "verb" },
+    { word: "differ _____", preposition: "from", hint: "отличаться от", category: "verb" },
+    { word: "divide _____", preposition: "into", hint: "делить на", category: "verb" },
+    { word: "discourage _____", preposition: "from", hint: "отговорить от", category: "verb" },
+    // Существительные
+    { word: "demand _____", preposition: "for", hint: "спрос на", category: "noun" },
+    { word: "difficulty _____", preposition: "in", hint: "проблемы с", category: "noun" },
+    { word: "disadvantage _____", preposition: "of", hint: "недостаток", category: "noun" },
+    { word: "decrease _____", preposition: "in", hint: "снижение", category: "noun" },
+    { word: "damage _____", preposition: "to", hint: "причинить урон", category: "noun" },
+    // Прилагательные
+    { word: "dependent _____", preposition: "on", hint: "зависит от", category: "adj" },
+    { word: "delighted _____", preposition: "with", hint: "доволен", category: "adj" },
+    { word: "different _____", preposition: "from", hint: "отличный от", category: "adj" },
+    { word: "dissatisfied _____", preposition: "with", hint: "недоволен", category: "adj" },
+    { word: "dressed _____", preposition: "in", hint: "одет в", category: "adj" },
+    { word: "disappointed _____", preposition: "with", hint: "разочарованный", category: "adj" },
+    // Фразы
+    { word: "in danger _____", preposition: "of", hint: "в опасности", category: "phrase" },
+    { word: "in the _____", preposition: "dark", hint: "в темноте", category: "phrase" },
+    { word: "in _____", preposition: "detail", hint: "в деталях", category: "phrase" },
+    { word: "on a _____", preposition: "diet", hint: "на диете", category: "phrase" },
+    { word: "on _____", preposition: "duty", hint: "на службе, на дежурстве", category: "phrase" },
+    { word: "in high _____", preposition: "demand", hint: "пользующийся спросом", category: "phrase" },
+  ],
+
+  /* ===== E ===== */
+  E: [
+    // Глаголы
+    { word: "escape _____", preposition: "from", hint: "сбежать", category: "verb" },
+    { word: "explain sth _____ sb", preposition: "to", hint: "объяснять что-то кому-то", category: "verb" },
+    { word: "exchange sth _____ sth", preposition: "for", hint: "обменять", category: "verb" },
+    { word: "excuse sb _____", preposition: "for", hint: "извинить за", category: "verb" },
+    // Существительные
+    { word: "an excuse _____", preposition: "for", hint: "оправдание", category: "noun" },
+    { word: "an effect _____", preposition: "on", hint: "оказывать эффект, влияние на", category: "noun" },
+    { word: "expert _____", preposition: "at", hint: "эксперт в", category: "noun" },
+    { word: "exception _____", preposition: "to", hint: "исключение", category: "noun" },
+    { word: "an experiment _____", preposition: "on", hint: "проводить эксперимент", category: "noun" },
+    // Прилагательные
+    { word: "engaged _____", preposition: "to", hint: "помолвлен с", category: "adj" },
+    { word: "enthusiastic _____", preposition: "about", hint: "увлечен в", category: "adj" },
+    { word: "envious _____", preposition: "of", hint: "завистливый", category: "adj" },
+    { word: "equal _____", preposition: "to", hint: "равен", category: "adj" },
+    { word: "excellent _____", preposition: "at", hint: "хорош в", category: "adj" },
+    { word: "excited _____", preposition: "about", hint: "рад, взволнован", category: "adj" },
+    { word: "experienced _____", preposition: "in", hint: "опытен в", category: "adj" },
+    { word: "eager _____", preposition: "for", hint: "жаждущий", category: "adj" },
+    // Фразы
+    { word: "in the _____", preposition: "end", hint: "в конце концов", category: "phrase" },
+    { word: "at the end _____", preposition: "of", hint: "в конце чего-то", category: "phrase" },
+    { word: "go on an _____", preposition: "expedition", hint: "поехать в экспедицию", category: "phrase" },
+  ],
+
+  /* ===== F ===== */
+  F: [
+    // Глаголы
+    { word: "fail _____", preposition: "in", hint: "провалить попытку", category: "verb" },
+    { word: "fall _____", preposition: "in", hint: "влюбиться", category: "verb" },
+    { word: "fill _____ with", preposition: "with", hint: "заполнить чем-то", category: "verb" },
+    { word: "forgive _____", preposition: "for", hint: "простить за", category: "verb" },
+    { word: "focus _____", preposition: "on", hint: "сконцентрироваться на", category: "verb" },
+    { word: "follow _____", preposition: "in", hint: "идти по стопам (follow in sb's steps)", category: "verb" },
+    // Существительные
+    { word: "failure _____", preposition: "in", hint: "неудача в", category: "noun" },
+    // Прилагательные
+    { word: "familiar _____ sb", preposition: "to", hint: "знаком кому-то", category: "adj" },
+    { word: "familiar _____ sth", preposition: "with", hint: "знаком с чем-то", category: "adj" },
+    { word: "famous _____", preposition: "for", hint: "знаменит", category: "adj" },
+    { word: "fed up _____", preposition: "with", hint: "сыт по горло", category: "adj" },
+    { word: "filled _____", preposition: "with", hint: "заполненный", category: "adj" },
+    { word: "full _____", preposition: "of", hint: "полон", category: "adj" },
+    { word: "fond _____", preposition: "of", hint: "увлечен", category: "adj" },
+    { word: "frightened _____", preposition: "of", hint: "напуган", category: "adj" },
+    { word: "furious _____ sb", preposition: "with", hint: "зол на кого-то", category: "adj" },
+    { word: "furious _____ sth", preposition: "about", hint: "зол на что-то", category: "adj" },
+    // Фразы
+    { word: "at _____", preposition: "first", hint: "сначала", category: "phrase" },
+    { word: "at first _____", preposition: "sight", hint: "с первого взгляда", category: "phrase" },
+    { word: "for _____", preposition: "fun", hint: "ради забавы", category: "phrase" },
+    { word: "for fear _____", preposition: "of", hint: "из-за страха", category: "phrase" },
+    { word: "in _____", preposition: "fact", hint: "на самом деле", category: "phrase" },
+    { word: "in _____", preposition: "fashion", hint: "в моде", category: "phrase" },
+    { word: "out of _____", preposition: "fashion", hint: "не в моде", category: "phrase" },
+    { word: "in favour _____", preposition: "of", hint: "в пользу", category: "phrase" },
+    { word: "in my free _____", preposition: "time", hint: "в свободное время", category: "phrase" },
+    { word: "in the _____", preposition: "future", hint: "в будущем", category: "phrase" },
+    { word: "on a _____", preposition: "farm", hint: "на ферме", category: "phrase" },
+    { word: "on _____", preposition: "fire", hint: "в огне", category: "phrase" },
+    { word: "on _____ foot", preposition: "foot", hint: "пешком", category: "phrase" },
+  ],
+
+  /* ===== G ===== */
+  G: [
+    // Глаголы
+    { word: "glance _____", preposition: "at", hint: "взглянуть на", category: "verb" },
+    { word: "get rid _____", preposition: "of", hint: "избавиться от", category: "verb" },
+    // Существительные
+    { word: "generosity _____", preposition: "to", hint: "щедрость по отношению к", category: "noun" },
+    // Прилагательные
+    { word: "good _____", preposition: "at", hint: "хорош в", category: "adj" },
+    { word: "good _____", preposition: "for", hint: "полезный для", category: "adj" },
+    { word: "grateful _____ sb", preposition: "to", hint: "благодарен кому-то", category: "adj" },
+    { word: "grateful _____ sth", preposition: "for", hint: "благодарен за что-то", category: "adj" },
+    { word: "guilty _____", preposition: "of", hint: "виновен в", category: "adj" },
+    { word: "guilty _____", preposition: "about", hint: "виноват", category: "adj" },
+    // Фразы
+    { word: "at a _____", preposition: "glance", hint: "с одного взгляда", category: "phrase" },
+    { word: "take for _____", preposition: "granted", hint: "принимать как должное", category: "phrase" },
+    { word: "in _____", preposition: "general", hint: "в общем", category: "phrase" },
+  ],
+
+  /* ===== H ===== */
+  H: [
+    // Глаголы
+    { word: "happen _____", preposition: "to", hint: "случиться с", category: "verb" },
+    { word: "hear _____", preposition: "about", hint: "слышать о (новостях)", category: "verb" },
+    { word: "hear _____ sb", preposition: "from", hint: "получать весть от", category: "verb" },
+    { word: "hear _____", preposition: "of", hint: "знать о", category: "verb" },
+    { word: "hope _____", preposition: "for", hint: "надеяться на", category: "verb" },
+    // Существительные
+    { word: "do harm _____", preposition: "to", hint: "приносить вред", category: "noun" },
+    { word: "no hope _____", preposition: "of", hint: "нет надежды на", category: "noun" },
+    // Прилагательные
+    { word: "happy _____", preposition: "about", hint: "счастлив по поводу", category: "adj" },
+    { word: "harmful _____", preposition: "to", hint: "вредный для", category: "adj" },
+    { word: "hopeless _____", preposition: "at", hint: "безнадежен в", category: "adj" },
+    { word: "high _____", preposition: "in", hint: "с высоким содержанием", category: "adj" },
+    // Фразы
+    { word: "at _____", preposition: "hand", hint: "под рукой", category: "phrase" },
+    { word: "at _____", preposition: "home", hint: "дома", category: "phrase" },
+    { word: "by _____", preposition: "hand", hint: "вручную", category: "phrase" },
+    { word: "by _____", preposition: "heart", hint: "наизусть", category: "phrase" },
+    { word: "in a _____", preposition: "hurry", hint: "в спешке", category: "phrase" },
+    { word: "in _____", preposition: "hospital", hint: "в больнице", category: "phrase" },
+    { word: "on the one _____", preposition: "hand", hint: "с одной стороны", category: "phrase" },
+    { word: "on _____", preposition: "holiday", hint: "в отпуске", category: "phrase" },
+    { word: "for a _____", preposition: "holiday", hint: "в отпуск", category: "phrase" },
+  ],
+
+  /* ===== I ===== */
+  I: [
+    // Добавь слова на I по мере распознавания фото
+    { word: "interested _____", preposition: "in", hint: "заинтересованный в", category: "adj" },
+    { word: "involved _____", preposition: "in", hint: "вовлеченный в", category: "adj" },
+    { word: "impressed _____", preposition: "with", hint: "впечатлен", category: "adj" },
+    { word: "insist _____", preposition: "on", hint: "настаивать на", category: "verb" },
+    { word: "invest _____", preposition: "in", hint: "инвестировать в", category: "verb" },
+    { word: "introduce _____ to", preposition: "to", hint: "представить кому-то", category: "verb" },
+  ],
+
+  /* ===== J ===== */
+  J: [
+    // Добавь слова на J
+    { word: "jealous _____", preposition: "of", hint: "завидовать", category: "adj" },
+  ],
+
+  /* ===== K ===== */
+  K: [
+    // Добавь слова на K
+    { word: "keen _____", preposition: "on", hint: "увлеченный", category: "adj" },
+    { word: "known _____", preposition: "for", hint: "известный", category: "adj" },
+  ],
+
+  /* ===== L ===== */
+  L: [
+    // Глаголы
+    { word: "lack _____", preposition: "in", hint: "не хватать из", category: "verb" },
+    { word: "laugh _____", preposition: "at", hint: "смеяться над", category: "verb" },
+    { word: "leave _____ Y", preposition: "for", hint: "уезжать в", category: "verb" },
+    { word: "lend sth _____ sb", preposition: "to", hint: "дать в долг", category: "verb" },
+    { word: "listen _____", preposition: "to", hint: "слушать", category: "verb" },
+    { word: "live _____", preposition: "on", hint: "жить на", category: "verb" },
+    { word: "limit sth _____", preposition: "to", hint: "ограничить", category: "verb" },
+    { word: "lead _____", preposition: "to", hint: "привести к", category: "verb" },
+    // Существительные
+    { word: "lack _____", preposition: "of", hint: "недостаток", category: "noun" },
+    // Прилагательные
+    { word: "late _____", preposition: "for", hint: "опоздавший", category: "adj" },
+    { word: "limited _____", preposition: "to", hint: "ограниченный", category: "adj" },
+    { word: "linked _____", preposition: "to", hint: "привязан к", category: "adj" },
+    // Фразы
+    { word: "at _____", preposition: "last", hint: "наконец", category: "phrase" },
+    { word: "at _____", preposition: "least", hint: "по крайней мере", category: "phrase" },
+    { word: "at a _____", preposition: "loss", hint: "в растерянности", category: "phrase" },
+    { word: "in the long _____", preposition: "run", hint: "в перспективе", category: "phrase" },
+    { word: "fall in love _____", preposition: "with", hint: "влюбиться в", category: "phrase" },
+    { word: "by _____", preposition: "land", hint: "сухопутным транспортом", category: "phrase" },
+    { word: "on the _____", preposition: "left", hint: "справа/слева", category: "phrase" },
+  ],
+
+  /* ===== M ===== */
+  M: [
+    // Глаголы
+    { word: "mistake X _____ Y", preposition: "for", hint: "принять кого-то за другого", category: "verb" },
+    { word: "mix _____", preposition: "with", hint: "смешивать", category: "verb" },
+    // Прилагательные
+    { word: "married _____", preposition: "to", hint: "женат, замужем", category: "adj" },
+    { word: "made _____", preposition: "of", hint: "сделан из (исходный материал виден)", category: "adj" },
+    { word: "made _____", preposition: "from", hint: "сделан из (материал изменился)", category: "adj" },
+    { word: "mad _____", preposition: "about", hint: "сильно увлеченный", category: "adj" },
+    // Фразы
+    { word: "at _____", preposition: "midnight", hint: "в полночь", category: "phrase" },
+    { word: "at the _____", preposition: "moment", hint: "в настоящий момент", category: "phrase" },
+    { word: "by means _____", preposition: "of", hint: "с помощью", category: "phrase" },
+    { word: "by all _____", preposition: "means", hint: "любой ценой", category: "phrase" },
+    { word: "by no _____", preposition: "means", hint: "ни в коем случае", category: "phrase" },
+    { word: "by _____", preposition: "mistake", hint: "по ошибке", category: "phrase" },
+    { word: "in a _____", preposition: "mess", hint: "в беспорядке", category: "phrase" },
+    { word: "in the _____", preposition: "mood", hint: "в настроении", category: "phrase" },
+    { word: "in the _____", preposition: "morning", hint: "утром", category: "phrase" },
+    { word: "from _____", preposition: "memory", hint: "по памяти", category: "phrase" },
+    { word: "by _____", preposition: "myself", hint: "сам", category: "phrase" },
+  ],
+
+  /* ===== N ===== */
+  N: [
+    // Глаголы
+    { word: "name _____", preposition: "after", hint: "назвать в честь кого-то", category: "verb" },
+    // Существительные
+    { word: "need _____", preposition: "for", hint: "необходимость в", category: "noun" },
+    { word: "take notice _____", preposition: "of", hint: "заметить", category: "noun" },
+    // Прилагательные
+    { word: "necessary _____", preposition: "for", hint: "необходимый", category: "adj" },
+    { word: "nervous _____", preposition: "about", hint: "переживать по поводу", category: "adj" },
+    { word: "new _____", preposition: "to", hint: "новенький", category: "adj" },
+    // Фразы
+    { word: "in need _____", preposition: "of", hint: "в нужде", category: "phrase" },
+    { word: "at _____", preposition: "night", hint: "ночью", category: "phrase" },
+    { word: "in the _____", preposition: "night", hint: "в ночное время", category: "phrase" },
+    { word: "at _____", preposition: "noon", hint: "в полдень", category: "phrase" },
+    { word: "in the _____", preposition: "north", hint: "на севере", category: "phrase" },
+    { word: "in a _____", preposition: "nutshell", hint: "вкратце", category: "phrase" },
+  ],
+
+  /* ===== O ===== */
+  O: [
+    // Глаголы
+    { word: "object _____", preposition: "to", hint: "возражать", category: "verb" },
+    { word: "occur _____", preposition: "to", hint: "приходить в голову", category: "verb" },
+    { word: "operate _____", preposition: "on", hint: "делать операцию", category: "verb" },
+    // Существительные
+    { word: "objection _____", preposition: "to", hint: "возражение", category: "noun" },
+    // Прилагательные
+    { word: "optimistic _____", preposition: "about", hint: "оптимистично настроен насчет", category: "adj" },
+    // Фразы
+    { word: "opposite _____", preposition: "to", hint: "напротив", category: "phrase" },
+    { word: "at _____", preposition: "once", hint: "сразу", category: "phrase" },
+    { word: "in my _____", preposition: "opinion", hint: "по моему мнению", category: "phrase" },
+    { word: "in order not _____", preposition: "to", hint: "чтобы не", category: "phrase" },
+    { word: "on the _____", preposition: "outskirts", hint: "на окраине", category: "phrase" },
+    { word: "on my _____", preposition: "own", hint: "сам, один", category: "phrase" },
+  ],
+
+  /* ===== P ===== */
+  P: [
+    // Добавь слова на P
+    { word: "proud _____", preposition: "of", hint: "гордый", category: "adj" },
+    { word: "pleased _____", preposition: "with", hint: "доволен", category: "adj" },
+    { word: "participate _____", preposition: "in", hint: "участвовать в", category: "verb" },
+    { word: "prevent _____ from", preposition: "from", hint: "мешать", category: "verb" },
+    { word: "pay attention _____", preposition: "to", hint: "обратить внимание на", category: "verb" },
+    { word: "point _____", preposition: "at", hint: "указывать на", category: "verb" },
+    { word: "patient _____", preposition: "with", hint: "терпеливый с", category: "adj" },
+    { word: "provide sb _____ sth", preposition: "with", hint: "обеспечивать кого-то чем-то", category: "verb" },
+  ],
+
+  /* ===== Q ===== */
+  Q: [
+    // Добавь слова на Q
+    { word: "quarrel _____", preposition: "with", hint: "ссориться с", category: "verb" },
+    { word: "qualify _____", preposition: "for", hint: "квалифицироваться для", category: "verb" },
+  ],
+
+  /* ===== R ===== */
+  R: [
+    // Добавь слова на R
+    { word: "rely _____", preposition: "on", hint: "полагаться на", category: "verb" },
+    { word: "result _____", preposition: "in", hint: "приводить к", category: "verb" },
+    { word: "react _____", preposition: "to", hint: "реагировать на", category: "verb" },
+    { word: "recover _____", preposition: "from", hint: "оправиться от", category: "verb" },
+    { word: "responsible _____", preposition: "for", hint: "ответственный за", category: "adj" },
+    { word: "related _____", preposition: "to", hint: "связанный с", category: "adj" },
+    { word: "remind sb _____", preposition: "of", hint: "напоминать кому-то", category: "verb" },
+  ],
+
+  /* ===== S ===== */
+  S: [
+    // Глаголы
+    { word: "save _____", preposition: "from", hint: "спасти от", category: "verb" },
+    { word: "search _____", preposition: "for", hint: "искать", category: "verb" },
+    { word: "sentence _____", preposition: "to", hint: "приговорить к", category: "verb" },
+    { word: "share sth _____", preposition: "with", hint: "делить, разделять", category: "verb" },
+    { word: "split _____", preposition: "into", hint: "делить на", category: "verb" },
+    { word: "shout _____", preposition: "at", hint: "кричать на кого-то", category: "verb" },
+    { word: "shout _____", preposition: "to", hint: "кричать кому-то", category: "verb" },
+    { word: "smile _____", preposition: "at", hint: "улыбаться", category: "verb" },
+    { word: "specialize _____", preposition: "in", hint: "специализироваться", category: "verb" },
+    { word: "spend money _____", preposition: "on", hint: "тратить деньги на", category: "verb" },
+    { word: "succeed _____", preposition: "in", hint: "преуспевать в", category: "verb" },
+    { word: "suffer _____", preposition: "from", hint: "страдать от", category: "verb" },
+    { word: "sympathise _____", preposition: "with", hint: "сочувствовать", category: "verb" },
+    { word: "suspect _____", preposition: "of", hint: "подозревать", category: "verb" },
+    { word: "speak _____ sb", preposition: "to", hint: "разговаривать с", category: "verb" },
+    { word: "speak _____ sth", preposition: "about", hint: "разговаривать о", category: "verb" },
+    { word: "smell _____", preposition: "of", hint: "пахнуть", category: "verb" },
+    // Существительные
+    { word: "solution _____", preposition: "to", hint: "решение", category: "noun" },
+    // Прилагательные
+    { word: "satisfied _____", preposition: "with", hint: "доволен", category: "adj" },
+    { word: "scared _____", preposition: "of", hint: "напуган", category: "adj" },
+    { word: "sensible _____", preposition: "of", hint: "разумо с чьей-то стороны", category: "adj" },
+    { word: "sensitive _____", preposition: "to", hint: "чувствителен к", category: "adj" },
+    { word: "serious _____", preposition: "about", hint: "серьезный", category: "adj" },
+    { word: "shocked _____", preposition: "by", hint: "шокирован", category: "adj" },
+    { word: "surprised _____", preposition: "by", hint: "удивлен", category: "adj" },
+    { word: "short _____", preposition: "of", hint: "не хватает", category: "adj" },
+    { word: "similar _____", preposition: "to", hint: "похож", category: "adj" },
+    { word: "surrounded _____", preposition: "by", hint: "окружен", category: "adj" },
+    { word: "suspicious _____", preposition: "of", hint: "подозрительный", category: "adj" },
+    { word: "suitable _____", preposition: "for", hint: "подходящий для", category: "adj" },
+    { word: "sorry _____", preposition: "about", hint: "сожалеть", category: "adj" },
+    { word: "feel sorry _____ sb", preposition: "for", hint: "сочувствовать", category: "adj" },
+    // Фразы
+    { word: "in search _____", preposition: "of", hint: "в поиске", category: "phrase" },
+    { word: "at _____", preposition: "school", hint: "в школе", category: "phrase" },
+    { word: "at _____", preposition: "sea", hint: "в плавание", category: "phrase" },
+    { word: "at the _____", preposition: "seaside", hint: "на побережье", category: "phrase" },
+    { word: "take by _____", preposition: "surprise", hint: "застать врасплох", category: "phrase" },
+    { word: "to my _____", preposition: "surprise", hint: "к моему удивлению", category: "phrase" },
+    { word: "on _____", preposition: "sale", hint: "в продаже", category: "phrase" },
+    { word: "for _____", preposition: "sale", hint: "на продажу", category: "phrase" },
+    { word: "in sight _____", preposition: "of", hint: "на виду", category: "phrase" },
+    { word: "out of _____", preposition: "sight", hint: "из виду", category: "phrase" },
+    { word: "in the _____", preposition: "sky", hint: "на небе", category: "phrase" },
+    { word: "on _____", preposition: "strike", hint: "на забастовке", category: "phrase" },
+    { word: "the same _____", preposition: "as", hint: "такой же как", category: "phrase" },
+    { word: "from _____", preposition: "scratch", hint: "с нуля", category: "phrase" },
+  ],
+
+  /* ===== T ===== */
+  T: [
+    // Глаголы
+    { word: "talk _____ sb about sth", preposition: "to", hint: "разговаривать с кем-то о чём-то", category: "verb" },
+    { word: "thank sb _____", preposition: "for", hint: "благодарить кого-то за", category: "verb" },
+    { word: "think _____", preposition: "about", hint: "думать о", category: "verb" },
+    { word: "threaten _____", preposition: "with", hint: "угрожать", category: "verb" },
+    { word: "throw _____", preposition: "at", hint: "бросать в", category: "verb" },
+    { word: "translate _____ into", preposition: "from", hint: "переводить с/на", category: "verb" },
+    { word: "tell sb _____", preposition: "about", hint: "сказать кому-то о", category: "verb" },
+    { word: "teach _____", preposition: "sb", hint: "учить кого-то", category: "verb" },
+    // Существительные
+    { word: "talent _____", preposition: "for", hint: "талант в", category: "noun" },
+    { word: "a taste _____", preposition: "in", hint: "вкус в", category: "noun" },
+    { word: "taste _____", preposition: "of", hint: "вкус чего-то", category: "noun" },
+    { word: "trouble _____", preposition: "with", hint: "проблема с", category: "noun" },
+    // Прилагательные
+    { word: "terrible _____", preposition: "at", hint: "ужасен в", category: "adj" },
+    { word: "terrified _____", preposition: "of", hint: "напуган", category: "adj" },
+    { word: "tired _____", preposition: "of", hint: "устал, надоело", category: "adj" },
+    { word: "tired _____", preposition: "from", hint: "устал от физического труда", category: "adj" },
+    { word: "typical _____", preposition: "of", hint: "типично для", category: "adj" },
+    { word: "thankful _____ sb for sth", preposition: "to", hint: "благодарен", category: "adj" },
+    // Фразы
+    { word: "thanks _____", preposition: "to", hint: "благодаря", category: "phrase" },
+    { word: "at _____", preposition: "times", hint: "временами", category: "phrase" },
+    { word: "at the top _____", preposition: "of", hint: "сверху", category: "phrase" },
+    { word: "in _____", preposition: "touch", hint: "на связи", category: "phrase" },
+    { word: "in _____", preposition: "town", hint: "в городе", category: "phrase" },
+    { word: "in _____", preposition: "turn", hint: "по очереди", category: "phrase" },
+    { word: "on good terms _____", preposition: "with", hint: "в хороших отношениях", category: "phrase" },
+    { word: "on _____", preposition: "time", hint: "вовремя", category: "phrase" },
+    { word: "on a trip _____", preposition: "tour", hint: "в путешествии", category: "phrase" },
+  ],
+
+  /* ===== U ===== */
+  U: [
+    // Прилагательные
+    { word: "unaware _____", preposition: "of", hint: "не осведомлен", category: "adj" },
+    { word: "upset _____", preposition: "about", hint: "расстроен", category: "adj" },
+    { word: "used _____", preposition: "to", hint: "привык к", category: "adj" },
+    // Фразы
+    { word: "at _____", preposition: "university", hint: "в университете", category: "phrase" },
+    { word: "in _____", preposition: "use", hint: "в пользовании", category: "phrase" },
+    { word: "make use _____", preposition: "of", hint: "воспользоваться", category: "phrase" },
+  ],
+
+  /* ===== V ===== */
+  V: [
+    // Глаголы
+    { word: "vote _____", preposition: "for", hint: "голосовать за", category: "verb" },
+    // Существительные
+    { word: "pay a visit _____", preposition: "to", hint: "навестить", category: "noun" },
+    { word: "a visitor _____", preposition: "to", hint: "посетитель", category: "noun" },
+    // Фразы
+    { word: "in _____", preposition: "vain", hint: "зря, напрасно", category: "phrase" },
+    { word: "in a loud voice", preposition: "loud", hint: "громко/тихо голосом", category: "phrase" },
+  ],
+
+  /* ===== W ===== */
+  W: [
+    // Глаголы
+    { word: "wait _____", preposition: "for", hint: "ждать", category: "verb" },
+    { word: "warn _____", preposition: "about", hint: "предупреждать", category: "verb" },
+    { word: "waste _____", preposition: "on", hint: "тратить (впустую) на", category: "verb" },
+    { word: "worry _____", preposition: "about", hint: "беспокоиться", category: "verb" },
+    { word: "welcome _____", preposition: "to", hint: "приветствовать", category: "verb" },
+    { word: "watch _____", preposition: "for", hint: "наблюдать, смотреть", category: "verb" },
+    // Прилагательные
+    { word: "worried _____", preposition: "about", hint: "обеспокоен", category: "adj" },
+    { word: "worthy _____", preposition: "of", hint: "стоящий", category: "adj" },
+    { word: "worth sth _____", preposition: "Ving", hint: "стоит того, чтобы", category: "adj" },
+    // Фразы
+    { word: "at the _____", preposition: "weekend", hint: "на выходных", category: "phrase" },
+    { word: "at _____", preposition: "work", hint: "на работе", category: "phrase" },
+    { word: "by the _____", preposition: "way", hint: "кстати", category: "phrase" },
+    { word: "on the _____", preposition: "way", hint: "по пути", category: "phrase" },
+    { word: "in a big _____", preposition: "way", hint: "сильно, очень, с размахом", category: "phrase" },
+    { word: "for a _____", preposition: "walk", hint: "на прогулку", category: "phrase" },
+    { word: "for a _____", preposition: "while", hint: "недолго", category: "phrase" },
+    { word: "in _____", preposition: "writing", hint: "письменно", category: "phrase" },
+    { word: "in a _____", preposition: "word", hint: "одним словом", category: "phrase" },
+    { word: "on the _____", preposition: "whole", hint: "в целом", category: "phrase" },
+    { word: "under the _____", preposition: "weather", hint: "нездоровиться", category: "phrase" },
+  ],
+
+  /* ===== X, Y, Z ===== */
+  X: [],
+  Y: [
+    { word: "in _____", preposition: "years", hint: "за последние годы", category: "phrase" },
+  ],
+  Z: [],
+};
+
+/* =================================================================
+   ПУЛА ПРЕДЛОГОВ для генерации неправильных ответов
+   Можно расширить этот список
+   ================================================================= */
+const ALL_PREPOSITIONS = [
+  "in", "on", "at", "with", "by", "for", "about", "of", "to",
+  "from", "off", "up", "into", "out", "through", "over", "under",
+  "after", "before", "since", "during", "along", "across", "between",
+  "among", "against", "without", "within", "beyond", "behind", "beside",
+  "below", "above", "near", "around", "towards", "throughout"
+];
+
+/* =================================================================
+   КАТЕГОРИИ (для отображения)
+   ================================================================= */
+const CATEGORY_LABELS = {
+  verb: "Глагол",
+  adj: "Прилагательное",
+  noun: "Существительное",
+  phrase: "Фраза"
+};
+
+/* =================================================================
+   СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+   ================================================================= */
+let currentLetter = null;
+let currentWords = [];
+let currentItem = null;
+let scoreCorrect = 0;
+let scoreWrong = 0;
+let streak = 0;
+let answered = false;
+
+/* =================================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ================================================================= */
+function init() {
+  renderLetterGrid();
+}
+
+/* Рендеринг сетки букв */
+function renderLetterGrid() {
+  const grid = document.getElementById('letter-grid');
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+  grid.innerHTML = alphabet.map(letter => {
+    const words = DATA[letter] || [];
+    const count = words.length;
+    const hasWords = count > 0;
+
+    return `<button 
+      class="letter-btn" 
+      ${hasWords ? `onclick="startQuiz('${letter}')"` : 'disabled'}
+      title="${hasWords ? `${count} фраз` : 'Нет данных'}"
+    >
+      ${letter}
+      <span class="count">${hasWords ? count : '—'}</span>
+    </button>`;
+  }).join('');
+}
+
+/* =================================================================
+   НАВИГАЦИЯ
+   ================================================================= */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goHome() {
+  showScreen('screen-home');
+  currentLetter = null;
+  scoreCorrect = 0;
+  scoreWrong = 0;
+  streak = 0;
+}
+
+/* =================================================================
+   ЗАПУСК ТЕСТА ПО БУКВЕ
+   ================================================================= */
+function startQuiz(letter) {
+  currentLetter = letter;
+  currentWords = [...(DATA[letter] || [])];
+  scoreCorrect = 0;
+  scoreWrong = 0;
+  streak = 0;
+
+  document.getElementById('quiz-letter-badge').textContent = letter;
+  updateScoreDisplay();
+
+  showScreen('screen-quiz');
+  nextQuestion();
+}
+
+/* =================================================================
+   СЛЕДУЮЩИЙ ВОПРОС
+   ================================================================= */
+function nextQuestion() {
+  answered = false;
+
+  // Скрываем кнопку "Далее" и уведомление о стрике
+  document.getElementById('next-btn').classList.remove('visible');
+  document.getElementById('streak-notice').classList.remove('show');
+
+  // Выбираем случайный элемент из массива буквы
+  currentItem = currentWords[Math.floor(Math.random() * currentWords.length)];
+
+  // Отображаем вопрос
+  const categoryLabel = CATEGORY_LABELS[currentItem.category] || 'Слово';
+  document.getElementById('q-category').textContent = categoryLabel;
+
+  // Формируем текст с пропуском
+  const displayWord = currentItem.word.includes('_____')
+    ? currentItem.word.replace('_____', '<span class="question-blank">_____</span>')
+    : `${currentItem.word} <span class="question-blank">_____</span>`;
+
+  document.getElementById('q-word').innerHTML = displayWord;
+  document.getElementById('q-hint').textContent = currentItem.hint || '';
+
+  // Генерируем варианты ответов
+  renderAnswers();
+}
+
+/* =================================================================
+   ГЕНЕРАЦИЯ ВАРИАНТОВ ОТВЕТА
+   Правило: 1 правильный + 4 уникальных неправильных
+   ================================================================= */
+function renderAnswers() {
+  const correct = currentItem.preposition;
+
+  // Пул всех предлогов из данных (чтобы ответы были реалистичными)
+  const allPreps = new Set(ALL_PREPOSITIONS);
+  allPreps.delete(correct); // Убираем правильный
+
+  // Перемешиваем и берём 4 неправильных
+  const wrongPool = shuffle([...allPreps]);
+  const wrongs = wrongPool.slice(0, 4);
+
+  // Итоговый список из 5 вариантов в случайном порядке
+  const options = shuffle([correct, ...wrongs]);
+
+  const grid = document.getElementById('answers-grid');
+  grid.innerHTML = options.map(opt => `
+    <button class="answer-btn" onclick="checkAnswer(this, '${opt}', '${correct}')">
+      ${opt}
+    </button>
+  `).join('');
+}
+
+/* =================================================================
+   ПРОВЕРКА ОТВЕТА
+   ================================================================= */
+function checkAnswer(btn, selected, correct) {
+  if (answered) return;
+  answered = true;
+
+  const allBtns = document.querySelectorAll('.answer-btn');
+
+  // Блокируем все кнопки
+  allBtns.forEach(b => b.disabled = true);
+
+  if (selected === correct) {
+    // ПРАВИЛЬНЫЙ ОТВЕТ
+    btn.classList.add('correct');
+    scoreCorrect++;
+    streak++;
+    updateScoreDisplay();
+    updateStreakBar();
+
+    // Показываем уведомление о серии
+    if (streak > 0 && streak % 5 === 0) {
+      const notice = document.getElementById('streak-notice');
+      notice.textContent = `🔥 Серия ${streak}! Отлично!`;
+      notice.classList.add('show');
+    }
+
+    // Автопереход через 1.2 секунды
+    setTimeout(nextQuestion, 1200);
+
+  } else {
+    // НЕПРАВИЛЬНЫЙ ОТВЕТ
+    btn.classList.add('wrong');
+    streak = 0;
+    scoreWrong++;
+    updateScoreDisplay();
+    updateStreakBar();
+
+    // Подсвечиваем правильный
+    allBtns.forEach(b => {
+      if (b.textContent.trim() === correct) {
+        b.classList.add('correct');
+      }
+    });
+
+    // Показываем кнопку "Далее"
+    document.getElementById('next-btn').classList.add('visible');
+  }
+}
+
+/* =================================================================
+   ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+   ================================================================= */
+
+/* Обновить отображение счёта */
+function updateScoreDisplay() {
+  document.getElementById('score-correct').textContent = scoreCorrect;
+  document.getElementById('score-wrong').textContent = scoreWrong;
+  document.getElementById('score-streak').textContent = streak;
+}
+
+/* Обновить полосу стрика (макс 10 = 100%) */
+function updateStreakBar() {
+  const pct = Math.min((streak / 10) * 100, 100);
+  document.getElementById('streak-bar').style.width = pct + '%';
+}
+
+/* Перемешать массив (Fisher-Yates) */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* =================================================================
+   ЗАПУСК
+   ================================================================= */
+init();
+</script>
+</body>
+</html>

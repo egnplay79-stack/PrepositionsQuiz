@@ -1,56 +1,105 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Preposition Master</title>
 <style>
+/* ===== DESIGN TOKENS ===== */
 :root {
-  --text: #eaeaf5;
-  --text-muted: #7878a0;
-  --accent: #8b7cf8;
-  --accent-2: #c471ed;
-  --accent-hover: #a395fa;
-  --accent-dim: rgba(139,124,248,0.14);
-  --bg-card: rgba(255,255,255,0.04);
-  --bg-card-h: rgba(255,255,255,0.07);
-  --correct: #4ecb8d;
-  --correct-dim: rgba(78,203,141,0.16);
-  --wrong: #f05a72;
-  --wrong-dim: rgba(240,90,114,0.16);
-  --border: rgba(255,255,255,0.08);
-  --border-h: rgba(255,255,255,0.15);
-  --radius: 14px;
+  --accent:    #8b7cf8;
+  --accent-2:  #c471ed;
+  --accent-dim:rgba(139,124,248,.14);
+  --correct:   #4ecb8d;
+  --correct-dim:rgba(78,203,141,.16);
+  --wrong:     #f05a72;
+  --wrong-dim: rgba(240,90,114,.16);
+  --radius:    14px;
   --radius-sm: 9px;
-  --tr: 0.22s ease;
+  --tr:        0.22s ease;
 }
+
+/* ---- DARK MODE (default) ---- */
+[data-theme="dark"] {
+  --bg-body-from: #0d0d1a;
+  --bg-body-to:   #0a0d1a;
+  --text:         #eaeaf5;
+  --text-muted:   #7878a0;
+  --bg-card:      rgba(255,255,255,.04);
+  --bg-card-h:    rgba(255,255,255,.07);
+  --border:       rgba(255,255,255,.08);
+  --border-h:     rgba(255,255,255,.16);
+  --modal-bg:     linear-gradient(145deg,#16132e,#12101f);
+  --modal-border: rgba(139,124,248,.25);
+  --topbar-bg:    rgba(13,13,26,.92);
+  --hp-color:     #c4b5fd;
+  --hp-border:    rgba(139,124,248,.35);
+  --hp-bg:        linear-gradient(135deg,rgba(139,124,248,.25),rgba(196,113,237,.2));
+}
+
+/* ---- LIGHT MODE ---- */
+[data-theme="light"] {
+  --bg-body-from: #f0f0fa;
+  --bg-body-to:   #e8e4f8;
+  --text:         #0f0f1a;
+  --text-muted:   #5a5a7a;
+  --bg-card:      rgba(255,255,255,.75);
+  --bg-card-h:    rgba(255,255,255,.9);
+  --border:       #000000;
+  --border-h:     #000000;
+  --modal-bg:     linear-gradient(145deg,#ffffff,#f5f0ff);
+  --modal-border: #000000;
+  --topbar-bg:    rgba(240,240,250,.94);
+  --hp-color:     #5b21b6;
+  --hp-border:    #000000;
+  --hp-bg:        linear-gradient(135deg,rgba(139,124,248,.2),rgba(196,113,237,.15));
+}
+
+/* ===== RESET ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
+
 body {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0d0d1a 0%, #14102a 40%, #0e1525 70%, #0a0d1a 100%);
-  background-attachment: fixed;
-  color: var(--text);
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  line-height: 1.6;
+  min-height:100vh;
+  background:linear-gradient(135deg, var(--bg-body-from) 0%, #14102a 40%, #0e1525 70%, var(--bg-body-to) 100%);
+  background-attachment:fixed;
+  color:var(--text);
+  font-family:-apple-system,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  line-height:1.6;
+  transition:background .3s ease,color .3s ease;
 }
+[data-theme="light"] body {
+  background:linear-gradient(135deg,#f0f0fa 0%,#ece8fd 40%,#e8e2fc 70%,#f4f0fe 100%);
+}
+
 body::before,body::after{
   content:'';position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;
 }
-body::before{
-  width:500px;height:500px;top:-120px;left:-160px;
-  background:radial-gradient(circle,rgba(139,124,248,0.13) 0%,transparent 70%);
+body::before{width:500px;height:500px;top:-120px;left:-160px;background:radial-gradient(circle,rgba(139,124,248,.13) 0%,transparent 70%)}
+body::after {width:420px;height:420px;bottom:-90px;right:-110px;background:radial-gradient(circle,rgba(196,113,237,.11) 0%,transparent 70%)}
+
+.app{position:relative;z-index:1;max-width:940px;margin:0 auto;padding:0 1.5rem 6rem}
+
+/* ===== THEME TOGGLE ===== */
+.theme-toggle {
+  position:fixed;left:16px;top:50%;transform:translateY(-50%);z-index:200;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
 }
-body::after{
-  width:420px;height:420px;bottom:-90px;right:-110px;
-  background:radial-gradient(circle,rgba(196,113,237,0.11) 0%,transparent 70%);
+.theme-toggle button {
+  width:40px;height:40px;border-radius:50%;border:1px solid var(--border);
+  background:var(--bg-card);color:var(--text);cursor:pointer;font-size:1.1rem;
+  transition:all var(--tr);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;
 }
-.app{position:relative;z-index:1;max-width:940px;margin:0 auto;padding:0 1.5rem 5rem}
+.theme-toggle button:hover{border-color:var(--accent);box-shadow:0 0 12px rgba(139,124,248,.3)}
+@media(max-width:600px){.theme-toggle{display:none}}
+
+/* ===== SCREENS ===== */
 .screen{display:none;animation:fadeUp .3s ease}
 .screen.active{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-/* HOME */
+/* ===== HOME ===== */
 .home-header{text-align:center;padding:4.5rem 0 2.5rem}
 .logo-chip{
   display:inline-block;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
@@ -60,41 +109,65 @@ body::after{
 .home-title{
   font-size:clamp(2.4rem,5.5vw,3.8rem);font-weight:800;letter-spacing:-.035em;line-height:1.1;
   background:linear-gradient(135deg,#e8e8f8 20%,#b39ef9 60%,#d678f0 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  margin-bottom:.8rem;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.8rem;
 }
-.home-sub{color:var(--text-muted);font-size:1rem;max-width:450px;margin:0 auto 2.4rem}
-.dict-open-btn{
+[data-theme="light"] .home-title{
+  background:linear-gradient(135deg,#4c1d95 20%,#7c3aed 60%,#a21caf 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.home-sub{color:var(--text-muted);font-size:1rem;max-width:450px;margin:0 auto 1.6rem}
+
+.home-action-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:2.8rem}
+.action-btn{
   display:inline-flex;align-items:center;gap:10px;cursor:pointer;
   background:linear-gradient(135deg,rgba(139,124,248,.18),rgba(196,113,237,.12));
   border:1px solid rgba(139,124,248,.3);color:var(--text);
-  padding:14px 28px;border-radius:var(--radius);font-size:1rem;font-weight:600;
-  transition:all var(--tr);margin-bottom:2.8rem;
+  padding:13px 24px;border-radius:var(--radius);font-size:.95rem;font-weight:600;
+  transition:all var(--tr);
 }
-.dict-open-btn:hover{
+[data-theme="light"] .action-btn{border-color:#000}
+.action-btn:hover{
   background:linear-gradient(135deg,rgba(139,124,248,.28),rgba(196,113,237,.22));
-  border-color:rgba(139,124,248,.55);transform:translateY(-2px);
-  box-shadow:0 8px 28px rgba(139,124,248,.18);
+  border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 28px rgba(139,124,248,.18);
 }
+.action-btn.mistakes-btn{
+  background:linear-gradient(135deg,rgba(240,90,114,.12),rgba(220,50,50,.08));
+  border-color:rgba(240,90,114,.35);
+}
+[data-theme="light"] .action-btn.mistakes-btn{border-color:#000}
+.action-btn.mistakes-btn:hover{
+  background:linear-gradient(135deg,rgba(240,90,114,.22),rgba(220,50,50,.15));
+  border-color:var(--wrong);box-shadow:0 8px 28px rgba(240,90,114,.2);
+}
+
 .section-label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem}
+
+/* ===== LETTER GRID ===== */
 .letter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:10px;margin-bottom:3rem}
 .letter-btn{
-  aspect-ratio:1;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  color:var(--text);font-size:1.35rem;font-weight:700;cursor:pointer;transition:all var(--tr);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:relative;overflow:hidden;
+  aspect-ratio:1;
+  border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-size:1.35rem;font-weight:700;cursor:pointer;
+  transition:border-color var(--tr),color var(--tr),transform var(--tr),box-shadow var(--tr);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  position:relative;overflow:hidden;outline:none;background-clip:padding-box;
+  /* default card background set via JS inline style or fallback */
+  background:var(--bg-card);
 }
-.letter-btn .lcount{font-size:9px;font-weight:400;color:var(--text-muted);letter-spacing:.04em}
+.letter-btn .lcount{font-size:9px;font-weight:400;color:var(--text-muted);letter-spacing:.04em;position:relative;z-index:1}
+.letter-btn .ltext{position:relative;z-index:1}
+/* glow overlay on hover */
 .letter-btn::after{
   content:'';position:absolute;inset:0;
   background:radial-gradient(circle at 50% 0%,rgba(139,124,248,.22),transparent 70%);
-  opacity:0;transition:opacity var(--tr);
+  opacity:0;transition:opacity var(--tr);pointer-events:none;
 }
-.letter-btn:hover:not(:disabled){border-color:var(--accent);color:#fff;transform:translateY(-3px);box-shadow:0 8px 26px rgba(139,124,248,.22)}
+.letter-btn:hover:not(:disabled){border-color:var(--accent);color:var(--text);transform:translateY(-3px);box-shadow:0 8px 26px rgba(139,124,248,.22)}
 .letter-btn:hover:not(:disabled)::after{opacity:1}
 .letter-btn:active:not(:disabled){transform:translateY(-1px)}
 .letter-btn:disabled{opacity:.22;cursor:not-allowed}
 
-/* QUIZ */
+/* ===== QUIZ ===== */
 .quiz-topbar{
   display:flex;align-items:center;justify-content:space-between;
   padding:1.6rem 0 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem;flex-wrap:wrap;gap:1rem;
@@ -147,94 +220,173 @@ body::after{
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 .next-btn{
   display:none;width:100%;padding:1rem;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  border:none;border-radius:var(--radius);color:#fff;font-size:1rem;font-weight:700;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));border:none;
+  border-radius:var(--radius);color:#fff;font-size:1rem;font-weight:700;
   cursor:pointer;transition:all var(--tr);letter-spacing:.04em;margin-top:.4rem;
 }
 .next-btn:hover{opacity:.88;transform:translateY(-1px)}
 .next-btn.show{display:block}
 
-/* MODAL */
+/* ===== RESULTS MODAL ===== */
 .modal-overlay{
   display:none;position:fixed;inset:0;background:rgba(5,4,15,.82);backdrop-filter:blur(8px);
-  z-index:100;align-items:center;justify-content:center;padding:1.5rem;
+  z-index:150;align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto;
 }
 .modal-overlay.show{display:flex;animation:fadeIn .3s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .modal-box{
-  background:linear-gradient(145deg,#16132e,#12101f);border:1px solid rgba(139,124,248,.25);border-radius:22px;
-  padding:2.8rem 2.2rem 2.2rem;max-width:490px;width:100%;text-align:center;
-  box-shadow:0 40px 80px rgba(0,0,0,.55),0 0 0 1px rgba(139,124,248,.08);
+  background:var(--modal-bg);border:1px solid var(--modal-border);border-radius:22px;
+  padding:2.4rem 2rem 2rem;max-width:540px;width:100%;text-align:center;
+  box-shadow:0 40px 80px rgba(0,0,0,.55);
   animation:slideUp .35s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes slideUp{from{opacity:0;transform:translateY(30px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-.modal-icon{font-size:3.2rem;margin-bottom:1rem}
+.modal-icon{font-size:3rem;margin-bottom:.8rem}
 .modal-title{
   font-size:1.9rem;font-weight:800;letter-spacing:-.03em;
-  background:linear-gradient(135deg,#e8e8f8,#b39ef9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.4rem;
+  background:linear-gradient(135deg,#e8e8f8,#b39ef9);-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.3rem;
 }
-.modal-letter{font-size:.9rem;color:var(--text-muted);margin-bottom:2rem}
-.modal-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.6rem}
+[data-theme="light"] .modal-title{background:linear-gradient(135deg,#3b0764,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.modal-letter{font-size:.9rem;color:var(--text-muted);margin-bottom:1.5rem}
+.modal-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
 .modal-stat{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem .8rem}
 .modal-stat .num{display:block;font-size:2rem;font-weight:800;line-height:1}
 .modal-stat .num.total{color:var(--accent)}.modal-stat .num.right{color:var(--correct)}.modal-stat .num.wrong-c{color:var(--wrong)}.modal-stat .num.pct{color:#f5c842}
 .modal-stat .lbl{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-top:4px}
-.modal-msg{font-size:.9rem;color:var(--text-muted);margin-bottom:2rem;line-height:1.5}
+.modal-msg{font-size:.9rem;color:var(--text-muted);margin-bottom:1.4rem;line-height:1.5}
+
+/* Mistakes list inside results modal */
+.modal-mistakes-section{text-align:left;margin-bottom:1.5rem}
+.modal-mistakes-title{
+  font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--wrong);margin-bottom:.8rem;
+}
+.modal-mistake-item{
+  background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--wrong);
+  border-radius:var(--radius-sm);padding:.65rem .9rem;margin-bottom:6px;font-size:.85rem;
+}
+.mmi-top{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap;margin-bottom:2px}
+.mmi-expr{color:var(--text);font-weight:600;flex:1}
+.mmi-correct{background:var(--correct-dim);border:1px solid var(--correct);color:var(--correct);font-weight:700;padding:1px 7px;border-radius:4px;font-size:.82rem}
+.mmi-wrong-ans{background:var(--wrong-dim);border:1px solid var(--wrong);color:var(--wrong);font-weight:700;padding:1px 7px;border-radius:4px;font-size:.82rem}
+.mmi-tr{color:var(--text-muted);font-size:.78rem;font-style:italic}
+
 .modal-btns{display:flex;gap:10px;flex-wrap:wrap}
-.modal-btn{flex:1;min-width:130px;padding:1rem;border-radius:var(--radius-sm);font-size:.95rem;font-weight:700;cursor:pointer;transition:all var(--tr)}
+.modal-btn{flex:1;min-width:130px;padding:1rem;border-radius:var(--radius-sm);font-size:.93rem;font-weight:700;cursor:pointer;transition:all var(--tr)}
 .modal-btn.ghost{background:var(--bg-card);border:1px solid var(--border);color:var(--text)}
 .modal-btn.ghost:hover{border-color:var(--border-h);background:var(--bg-card-h)}
 .modal-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));border:none;color:#fff}
 .modal-btn.primary:hover{opacity:.88;transform:translateY(-1px)}
 
-/* DICT */
+/* ===== DICTIONARY SCREEN ===== */
 .dict-topbar{
-  display:flex;align-items:center;gap:1rem;padding:1.6rem 0 1.8rem;border-bottom:1px solid var(--border);margin-bottom:2.2rem;
-  position:sticky;top:0;background:linear-gradient(135deg,#0d0d1af2 0%,#14102af2 100%);
-  backdrop-filter:blur(14px);z-index:10;
+  display:flex;align-items:center;gap:1rem;padding:1.4rem 0 1.6rem;border-bottom:1px solid var(--border);margin-bottom:2.2rem;
+  position:sticky;top:0;background:var(--topbar-bg);backdrop-filter:blur(16px);z-index:50;
+  transition:transform .3s ease;
 }
+.dict-topbar.hidden-header{transform:translateY(-100%)}
 .dict-topbar h2{
   font-size:1.3rem;font-weight:800;
   background:linear-gradient(135deg,#e8e8f8,#b39ef9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1;
 }
+[data-theme="light"] .dict-topbar h2{background:linear-gradient(135deg,#3b0764,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .dict-letter-block{margin-bottom:3rem}
 .dict-letter-heading{font-size:2rem;font-weight:900;letter-spacing:-.04em;color:var(--accent);margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
 .dict-cat-heading{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);margin:1.4rem 0 .7rem}
 .dict-entries{display:flex;flex-direction:column;gap:6px}
 .dict-entry{
-  background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:.7rem 1.1rem;
-  font-size:.9rem;line-height:1.5;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
+  background:var(--bg-card);border:1px solid var(--border);border-radius:10px;
+  padding:.7rem 1.1rem;font-size:.9rem;line-height:1.5;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
 }
 .dict-entry-phrase{color:var(--text);font-weight:500;flex:1;min-width:160px}
 .dict-entry-phrase .hp{
-  display:inline-block;
-  background:linear-gradient(135deg,rgba(139,124,248,.25),rgba(196,113,237,.2));
-  border:1px solid rgba(139,124,248,.35);color:#c4b5fd;font-weight:700;
-  padding:1px 7px;border-radius:5px;font-size:.88rem;
+  display:inline-block;background:var(--hp-bg);border:1px solid var(--hp-border);
+  color:var(--hp-color);font-weight:700;padding:1px 7px;border-radius:5px;font-size:.88rem;
 }
 .dict-entry-tr{color:var(--text-muted);font-size:.83rem;font-style:italic;flex-shrink:0}
+
+/* ===== MISTAKE ANALYTICS CENTER ===== */
+.analytics-overlay{
+  display:none;position:fixed;inset:0;background:rgba(5,4,15,.88);backdrop-filter:blur(10px);
+  z-index:180;animation:fadeIn .3s ease;overflow-y:auto;
+}
+.analytics-overlay.show{display:block}
+.analytics-inner{max-width:780px;margin:0 auto;padding:2.5rem 1.5rem 4rem}
+.analytics-header{
+  display:flex;align-items:center;gap:1rem;margin-bottom:2.2rem;
+  padding-bottom:1.2rem;border-bottom:1px solid var(--border);
+}
+.analytics-header h2{
+  font-size:1.6rem;font-weight:800;
+  background:linear-gradient(135deg,#e8e8f8,#b39ef9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1;
+}
+[data-theme="light"] .analytics-header h2{background:linear-gradient(135deg,#3b0764,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:10px;margin-bottom:2.5rem}
+.ana-letter-btn{
+  aspect-ratio:1;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-size:1.3rem;font-weight:700;cursor:pointer;transition:all var(--tr);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;outline:none;
+  background-clip:padding-box;overflow:hidden;
+}
+.ana-letter-btn:disabled{opacity:.2;cursor:not-allowed}
+.ana-letter-btn.has-mistakes{
+  border-color:#ef4444;box-shadow:0 0 0 2px rgba(239,68,68,.35),0 4px 18px rgba(239,68,68,.2);
+  background:rgba(239,68,68,.12);color:#fca5a5;
+}
+.ana-letter-btn .ana-count{font-size:8px;color:var(--text-muted)}
+.ana-letter-btn.has-mistakes .ana-count{color:#fca5a5}
+/* Drilldown panel */
+.ana-drilldown{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem 1.2rem}
+.ana-drilldown-title{font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:1rem}
+.ana-no-mistakes{
+  text-align:center;padding:2rem;color:var(--correct);font-weight:600;font-size:1rem;
+}
+.ana-mistake-row{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);border-left:3px solid var(--wrong);
+  border-radius:var(--radius-sm);padding:.65rem .9rem;margin-bottom:6px;
+}
+[data-theme="light"] .ana-mistake-row{background:rgba(0,0,0,.03)}
+.ana-row-top{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline;margin-bottom:2px}
+.ana-expr{font-size:.9rem;font-weight:600;color:var(--text);flex:1}
+.ana-badge{font-size:.78rem;font-weight:700;padding:1px 8px;border-radius:4px}
+.ana-badge.correct{background:var(--correct-dim);border:1px solid var(--correct);color:var(--correct)}
+.ana-badge.wrong{background:var(--wrong-dim);border:1px solid var(--wrong);color:var(--wrong)}
+.ana-tr{font-size:.78rem;color:var(--text-muted);font-style:italic}
+
+/* ===== RESPONSIVE ===== */
 @media(max-width:600px){
-  .q-card{padding:2rem 1.2rem 1.6rem}.quiz-topbar{flex-direction:row}
-  .modal-box{padding:2rem 1.4rem 1.6rem}.dict-entry{flex-direction:column;gap:2px}
+  .q-card{padding:2rem 1.2rem 1.6rem}
+  .modal-box{padding:2rem 1.2rem 1.6rem}
+  .dict-entry{flex-direction:column;gap:2px}
+  .home-action-row{flex-direction:column;align-items:center}
 }
 </style>
 </head>
 <body>
+
+<!-- Theme toggle (left side) -->
+<div class="theme-toggle">
+  <button onclick="toggleTheme()" id="theme-btn" title="Переключить тему">🌙</button>
+</div>
+
 <div class="app">
 
-<!-- HOME -->
+<!-- ===================== HOME ===================== -->
 <div id="s-home" class="screen active">
   <div class="home-header">
     <div class="logo-chip">ЦТ · Английские предлоги</div>
     <h1 class="home-title">Preposition<br>Master</h1>
-    <p class="home-sub">Тренируй предлоги и фразовые глаголы из программы ЦТ — без повторов, с результатами</p>
-    <button class="dict-open-btn" onclick="openDict()"><span>📖</span> Открыть словарь выражений</button>
+    <p class="home-sub">Тренируй предлоги и фразовые глаголы из программы ЦТ — без повторов, с аналитикой ошибок</p>
+    <div class="home-action-row">
+      <button class="action-btn" onclick="openDict()">📖 Словарь выражений</button>
+      <button class="action-btn mistakes-btn" onclick="openAnalytics()">🔴 Посмотреть свои ошибки</button>
+    </div>
   </div>
   <p class="section-label">Выбери букву — начнётся тест</p>
   <div class="letter-grid" id="letter-grid"></div>
 </div>
 
-<!-- QUIZ -->
+<!-- ===================== QUIZ ===================== -->
 <div id="s-quiz" class="screen">
   <div class="quiz-topbar">
     <button class="back-btn" onclick="goHome()">← На главную</button>
@@ -258,16 +410,16 @@ body::after{
   <button class="next-btn" id="next-btn" onclick="nextQ()">Следующее слово →</button>
 </div>
 
-<!-- DICT -->
+<!-- ===================== DICTIONARY ===================== -->
 <div id="s-dict" class="screen">
-  <div class="dict-topbar">
+  <div class="dict-topbar" id="dict-topbar">
     <button class="back-btn" onclick="goHome()">← Назад</button>
     <h2>📖 Словарь выражений</h2>
   </div>
   <div id="dict-content"></div>
 </div>
 
-<!-- MODAL RESULTS -->
+<!-- ===================== RESULTS MODAL ===================== -->
 <div class="modal-overlay" id="result-modal">
   <div class="modal-box">
     <div class="modal-icon" id="modal-icon">🎯</div>
@@ -275,11 +427,13 @@ body::after{
     <div class="modal-letter" id="modal-letter">Буква A</div>
     <div class="modal-stats">
       <div class="modal-stat"><span class="num total" id="m-total">0</span><span class="lbl">Всего слов</span></div>
-      <div class="modal-stat"><span class="num pct" id="m-pct">0%</span><span class="lbl">Успешность</span></div>
+      <div class="modal-stat"><span class="num pct"   id="m-pct">0%</span><span class="lbl">Успешность</span></div>
       <div class="modal-stat"><span class="num right" id="m-right">0</span><span class="lbl">Правильных</span></div>
       <div class="modal-stat"><span class="num wrong-c" id="m-wrong">0</span><span class="lbl">Ошибок</span></div>
     </div>
     <div class="modal-msg" id="modal-msg"></div>
+    <!-- Mistakes list -->
+    <div class="modal-mistakes-section" id="modal-mistakes-section"></div>
     <div class="modal-btns">
       <button class="modal-btn ghost" onclick="goHome()">🏠 На главную</button>
       <button class="modal-btn primary" onclick="restartQuiz()">🔄 Пройти снова</button>
@@ -287,14 +441,27 @@ body::after{
   </div>
 </div>
 
+<!-- ===================== ANALYTICS OVERLAY ===================== -->
+<div class="analytics-overlay" id="analytics-overlay">
+  <div class="analytics-inner">
+    <div class="analytics-header">
+      <button class="back-btn" onclick="closeAnalytics()">← Назад</button>
+      <h2>🔴 Мои ошибки</h2>
+    </div>
+    <div class="analytics-grid" id="analytics-grid"></div>
+    <div id="analytics-drilldown"></div>
+  </div>
 </div>
+
+</div><!-- .app -->
+
 <script>
-/* ============================================================
-   БАЗА ДАННЫХ
-   ============================================================ */
+/* ================================================================
+   DATABASE
+   ================================================================ */
 const DB = {
-  A: {
-    verbs: [
+  A:{
+    verbs:[
       {text:"admire sb _____ sth",correct:"for",translation:"восхищаться кем-то за что-то"},
       {text:"apologize _____ sb _____ sth",correct:"to / for",translation:"извиняться перед кем-то за что-то",multi:true,options:["to","for"]},
       {text:"aim _____",correct:"at",translation:"нацелиться на"},
@@ -315,7 +482,7 @@ const DB = {
       {text:"access _____ sth",correct:"без предлога",translation:"получить доступ к чему-то"},
       {text:"attend _____ sth",correct:"без предлога",translation:"посещать что-то"}
     ],
-    nouns: [
+    nouns:[
       {text:"access _____",correct:"to",translation:"доступ к"},
       {text:"advantage _____",correct:"of",translation:"преимущество, плюс"},
       {text:"disadvantage _____",correct:"of",translation:"недостаток чего-то"},
@@ -327,7 +494,7 @@ const DB = {
       {text:"attitude _____",correct:"to",translation:"отношение к"},
       {text:"ability _____",correct:"in",translation:"способность в"}
     ],
-    adjectives: [
+    adjectives:[
       {text:"accompanied _____",correct:"by",translation:"в сопровождении"},
       {text:"addicted _____",correct:"to",translation:"зависимый от"},
       {text:"amazed _____",correct:"at / by",translation:"удивлённый чем-то",alternative:true},
@@ -345,7 +512,7 @@ const DB = {
       {text:"attached _____",correct:"to",translation:"прикреплённый, привязанный к"},
       {text:"absent _____",correct:"from",translation:"отсутствующий в/на"}
     ],
-    phrases: [
+    phrases:[
       {text:"according _____",correct:"to",translation:"в соответствии с"},
       {text:"in addition _____",correct:"to",translation:"в добавок к"},
       {text:"_____ average",correct:"on",translation:"в среднем"},
@@ -355,8 +522,8 @@ const DB = {
       {text:"apart _____",correct:"from",translation:"кроме"}
     ]
   },
-  B: {
-    verbs: [
+  B:{
+    verbs:[
       {text:"belong _____",correct:"to",translation:"принадлежать к"},
       {text:"benefit _____",correct:"from",translation:"получать выгоду от"},
       {text:"blame _____ sb/sth",correct:"on",translation:"винить кого-то / сваливать вину на"},
@@ -371,10 +538,8 @@ const DB = {
       {text:"brush _____",correct:"up",translation:"совершенствовать, освежать знания"},
       {text:"burst _____ laughing",correct:"out",translation:"рассмеяться"}
     ],
-    nouns: [
-      {text:"put/lay the blame _____ sb/sth",correct:"on",translation:"перекладывать вину на кого-то/что-то"}
-    ],
-    adjectives: [
+    nouns:[{text:"put/lay the blame _____ sb/sth",correct:"on",translation:"перекладывать вину на кого-то/что-то"}],
+    adjectives:[
       {text:"bad _____",correct:"at",translation:"плох в (чём-то)"},
       {text:"based _____",correct:"on",translation:"основан на"},
       {text:"bored _____ sth",correct:"with",translation:"утомлённый чем-то / скучающий от"},
@@ -383,7 +548,7 @@ const DB = {
       {text:"blue _____ (cold)",correct:"with",translation:"синий от (холода)"},
       {text:"born _____ a ... family",correct:"into",translation:"родиться в ... семье"}
     ],
-    phrases: [
+    phrases:[
       {text:"in brief",correct:"in",translation:"коротко",static:true},
       {text:"in the beginning",correct:"in",translation:"изначально",static:true},
       {text:"_____ the beginning of",correct:"at",translation:"в начале чего-то"},
@@ -397,8 +562,8 @@ const DB = {
       {text:"_____ business",correct:"on",translation:"по работе / по делу"}
     ]
   },
-  C: {
-    verbs: [
+  C:{
+    verbs:[
       {text:"care _____ (заботиться)",correct:"about",translation:"заботиться о / волноваться о"},
       {text:"care _____ (проявлять любовь)",correct:"for",translation:"проявлять любовь, хотеть"},
       {text:"cause _____ X",correct:"без предлога",translation:"вести к, служить причиной"},
@@ -423,7 +588,7 @@ const DB = {
       {text:"compare _____",correct:"to / with",translation:"сравнивать с",alternative:true},
       {text:"cure _____",correct:"of",translation:"лечить от"}
     ],
-    nouns: [
+    nouns:[
       {text:"cause _____",correct:"of",translation:"причина чего-то"},
       {text:"cheque _____ (на сумму)",correct:"for",translation:"чек на (сумму)"},
       {text:"cure _____ (лекарство от)",correct:"for",translation:"лекарство от"},
@@ -434,7 +599,7 @@ const DB = {
       {text:"take a chance",correct:"без предлога",translation:"воспользоваться шансом",static:true},
       {text:"catch/have a cold",correct:"без предлога",translation:"простудиться",static:true}
     ],
-    adjectives: [
+    adjectives:[
       {text:"capable _____",correct:"of",translation:"способный на"},
       {text:"certain _____",correct:"of",translation:"уверенный в"},
       {text:"characteristic _____",correct:"of",translation:"типичный для"},
@@ -449,7 +614,7 @@ const DB = {
       {text:"concerned _____",correct:"about",translation:"обеспокоенный чем-то"},
       {text:"confused _____",correct:"about",translation:"растерянный / запутанный из-за"}
     ],
-    phrases: [
+    phrases:[
       {text:"_____ chance (случайно)",correct:"by",translation:"случайно"},
       {text:"in charge _____",correct:"of",translation:"во главе / ответственный за"},
       {text:"free _____ charge",correct:"of",translation:"бесплатный"},
@@ -471,8 +636,8 @@ const DB = {
       {text:"_____ class",correct:"in",translation:"на уроке, в школе"}
     ]
   },
-  D: {
-    verbs: [
+  D:{
+    verbs:[
       {text:"date back _____",correct:"to",translation:"датироваться (каким-то временем)"},
       {text:"date _____ (от какого-то времени)",correct:"from",translation:"датироваться от"},
       {text:"demand _____ sb",correct:"from",translation:"требовать от кого-то"},
@@ -491,14 +656,14 @@ const DB = {
       {text:"divide _____",correct:"into",translation:"делить на"},
       {text:"discourage _____",correct:"from",translation:"отговорить от"}
     ],
-    nouns: [
+    nouns:[
       {text:"do damage _____",correct:"to",translation:"причинить урон чему-то"},
       {text:"demand _____",correct:"for",translation:"спрос на"},
       {text:"have difficulty _____",correct:"in / with",translation:"проблемы с / трудности в",alternative:true},
       {text:"disadvantage _____",correct:"of",translation:"недостаток чего-то"},
       {text:"decrease _____",correct:"in",translation:"снижение в"}
     ],
-    adjectives: [
+    adjectives:[
       {text:"dependent _____",correct:"on",translation:"зависим от"},
       {text:"delighted _____",correct:"with",translation:"доволен чем-то"},
       {text:"different _____",correct:"from",translation:"отличный от"},
@@ -506,7 +671,7 @@ const DB = {
       {text:"dressed _____",correct:"in",translation:"одет в"},
       {text:"disappointed _____",correct:"with / in",translation:"разочарованный чем-то/в чём-то",alternative:true}
     ],
-    phrases: [
+    phrases:[
       {text:"in danger _____",correct:"of",translation:"в опасности"},
       {text:"_____ the dark",correct:"in",translation:"в темноте"},
       {text:"_____ detail",correct:"in",translation:"в деталях"},
@@ -515,22 +680,22 @@ const DB = {
       {text:"in demand",correct:"in",translation:"пользующийся спросом",static:true}
     ]
   },
-  E: {
-    verbs: [
+  E:{
+    verbs:[
       {text:"escape _____",correct:"from",translation:"сбежать из/от"},
       {text:"enter _____ X",correct:"без предлога",translation:"войти, поступить в"},
       {text:"explain sth _____ sb",correct:"to",translation:"объяснить что-то кому-то"},
       {text:"exchange sth _____ sth",correct:"for",translation:"обменять что-то на что-то"},
       {text:"excuse sb _____",correct:"for",translation:"извинить кого-то за"}
     ],
-    nouns: [
+    nouns:[
       {text:"make an excuse _____",correct:"for",translation:"придумать оправдание для"},
       {text:"have an effect _____",correct:"on",translation:"оказывать эффект, влияние на"},
       {text:"expert _____",correct:"at / in",translation:"эксперт в",alternative:true},
       {text:"exception _____",correct:"to",translation:"исключение из"},
       {text:"conduct an experiment _____",correct:"on / with",translation:"проводить эксперимент на/с",alternative:true}
     ],
-    adjectives: [
+    adjectives:[
       {text:"engaged _____ sb",correct:"to",translation:"помолвлен с"},
       {text:"engaged _____ sth (занятый в)",correct:"in",translation:"занят в"},
       {text:"enthusiastic _____",correct:"about",translation:"увлечён чем-то / в восторге от"},
@@ -541,14 +706,14 @@ const DB = {
       {text:"experienced _____",correct:"in",translation:"опытен в"},
       {text:"eager _____",correct:"for",translation:"жаждущий чего-то"}
     ],
-    phrases: [
+    phrases:[
       {text:"in the end",correct:"in",translation:"в конце концов",static:true},
       {text:"_____ the end of",correct:"at",translation:"в конце чего-то"},
       {text:"go _____ an expedition",correct:"on",translation:"поехать в экспедицию"}
     ]
   },
-  F: {
-    verbs: [
+  F:{
+    verbs:[
       {text:"fail _____ an attempt",correct:"in",translation:"провалить попытку"},
       {text:"fail _____ V",correct:"to",translation:"не получиться (сделать что-то)"},
       {text:"fall _____ sth (падение показателей)",correct:"in",translation:"падение чего-то"},
@@ -562,10 +727,8 @@ const DB = {
       {text:"follow _____ X",correct:"без предлога",translation:"следовать за чем-то"},
       {text:"follow _____ sb's steps",correct:"in",translation:"идти по стопам кого-то"}
     ],
-    nouns: [
-      {text:"failure _____",correct:"in",translation:"неудача в"}
-    ],
-    adjectives: [
+    nouns:[{text:"failure _____",correct:"in",translation:"неудача в"}],
+    adjectives:[
       {text:"familiar _____ sb (знаком кому-то)",correct:"to",translation:"знаком кому-то"},
       {text:"familiar _____ sth (знаком с чем-то)",correct:"with",translation:"знаком с чем-то"},
       {text:"famous _____",correct:"for",translation:"знаменит чем-то"},
@@ -577,7 +740,7 @@ const DB = {
       {text:"furious _____ sb",correct:"with",translation:"зол на кого-то"},
       {text:"furious _____ sth",correct:"about / at",translation:"зол на что-то",alternative:true}
     ],
-    phrases: [
+    phrases:[
       {text:"_____ first",correct:"at",translation:"сначала"},
       {text:"_____ first sight",correct:"at",translation:"с первого взгляда"},
       {text:"_____ fun",correct:"for",translation:"ради забавы"},
@@ -594,8 +757,8 @@ const DB = {
       {text:"_____ foot",correct:"on",translation:"пешком"}
     ]
   },
-  G: {
-    verbs: [
+  G:{
+    verbs:[
       {text:"glance _____",correct:"at",translation:"взглянуть на"},
       {text:"get rid _____",correct:"of",translation:"избавиться от"},
       {text:"go online",correct:"без предлога",translation:"выйти в интернет",static:true},
@@ -603,10 +766,8 @@ const DB = {
       {text:"go _____ a trip/tour",correct:"on",translation:"поехать в поездку"},
       {text:"go _____ a walk",correct:"for",translation:"прогуляться"}
     ],
-    nouns: [
-      {text:"generosity _____ sb",correct:"to",translation:"щедрость по отношению к"}
-    ],
-    adjectives: [
+    nouns:[{text:"generosity _____ sb",correct:"to",translation:"щедрость по отношению к"}],
+    adjectives:[
       {text:"good _____ sth (хорош в)",correct:"at",translation:"хорош в (чём-то)"},
       {text:"good _____ sb (добр к)",correct:"to",translation:"добр к кому-то"},
       {text:"good _____ health (полезный для)",correct:"for",translation:"полезный для"},
@@ -615,14 +776,14 @@ const DB = {
       {text:"guilty _____ a crime",correct:"of",translation:"виновен в"},
       {text:"guilty _____ sth (чувство вины)",correct:"about",translation:"виноват из-за"}
     ],
-    phrases: [
+    phrases:[
       {text:"_____ a glance",correct:"at",translation:"с одного взгляда"},
       {text:"take _____ granted",correct:"for",translation:"принимать как должное"},
       {text:"in general",correct:"in",translation:"в общем",static:true}
     ]
   },
-  H: {
-    verbs: [
+  H:{
+    verbs:[
       {text:"happen _____",correct:"to",translation:"случиться с"},
       {text:"hear _____ (узнать новости)",correct:"about",translation:"слышать о"},
       {text:"hear _____ sb (получить весть от)",correct:"from",translation:"получать весть от кого-то"},
@@ -630,17 +791,17 @@ const DB = {
       {text:"hope _____",correct:"for",translation:"надеяться на"},
       {text:"handle _____ X",correct:"без предлога",translation:"справиться с чем-то"}
     ],
-    nouns: [
+    nouns:[
       {text:"do harm _____",correct:"to",translation:"приносить вред чему-то"},
       {text:"no hope _____",correct:"of",translation:"нет надежды на"}
     ],
-    adjectives: [
+    adjectives:[
       {text:"happy _____",correct:"about / with",translation:"счастлив по поводу чего-то",alternative:true},
       {text:"harmful _____",correct:"to",translation:"вредный для"},
       {text:"hopeless _____",correct:"at",translation:"безнадёжен в (чём-то)"},
       {text:"high _____",correct:"in",translation:"с высоким содержанием чего-то"}
     ],
-    phrases: [
+    phrases:[
       {text:"_____ hand (под рукой)",correct:"at",translation:"под рукой"},
       {text:"_____ home",correct:"at",translation:"дома"},
       {text:"_____ hand (вручную)",correct:"by",translation:"вручную"},
@@ -653,8 +814,8 @@ const DB = {
       {text:"go _____ a holiday",correct:"for",translation:"в отпуск"}
     ]
   },
-  L: {
-    verbs: [
+  L:{
+    verbs:[
       {text:"lack _____ sth",correct:"in",translation:"испытывать нехватку"},
       {text:"laugh _____",correct:"at",translation:"смеяться над"},
       {text:"leave X _____ Y (уезжать в Y)",correct:"for",translation:"уезжать из X в Y"},
@@ -664,15 +825,13 @@ const DB = {
       {text:"limit sth _____",correct:"to",translation:"ограничить что-то чем-то"},
       {text:"lead _____",correct:"to",translation:"привести к"}
     ],
-    nouns: [
-      {text:"lack _____",correct:"of",translation:"недостаток чего-то"}
-    ],
-    adjectives: [
+    nouns:[{text:"lack _____",correct:"of",translation:"недостаток чего-то"}],
+    adjectives:[
       {text:"late _____",correct:"for",translation:"опоздавший на"},
       {text:"limited _____",correct:"to",translation:"ограниченный чем-то"},
       {text:"linked _____",correct:"to",translation:"привязан к / связан с"}
     ],
-    phrases: [
+    phrases:[
       {text:"_____ last",correct:"at",translation:"наконец"},
       {text:"_____ least",correct:"at",translation:"по крайней мере"},
       {text:"_____ a loss",correct:"at",translation:"в растерянности"},
@@ -682,19 +841,19 @@ const DB = {
       {text:"_____ the left",correct:"on",translation:"слева"}
     ]
   },
-  M: {
-    verbs: [
+  M:{
+    verbs:[
       {text:"marry _____ sb",correct:"без предлога",translation:"выходить замуж, жениться на ком-то"},
       {text:"mistake X _____ Y",correct:"for",translation:"принять кого-то/что-то за другого"},
       {text:"mix _____",correct:"with",translation:"смешивать с"}
     ],
-    adjectives: [
+    adjectives:[
       {text:"married _____",correct:"to",translation:"женат на / замужем за"},
       {text:"made _____ (материал виден)",correct:"of",translation:"сделан из"},
       {text:"made _____ (материал изменился)",correct:"from",translation:"сделан из"},
       {text:"mad _____",correct:"about",translation:"сильно увлечённый чем-то"}
     ],
-    phrases: [
+    phrases:[
       {text:"_____ midnight",correct:"at",translation:"в полночь"},
       {text:"_____ the moment",correct:"at",translation:"в настоящий момент"},
       {text:"by means _____",correct:"of",translation:"с помощью чего-то"},
@@ -709,20 +868,18 @@ const DB = {
       {text:"_____ myself",correct:"by",translation:"самостоятельно"}
     ]
   },
-  N: {
-    verbs: [
-      {text:"name _____",correct:"after",translation:"назвать в честь кого-то"}
-    ],
-    nouns: [
+  N:{
+    verbs:[{text:"name _____",correct:"after",translation:"назвать в честь кого-то"}],
+    nouns:[
       {text:"need _____",correct:"for",translation:"необходимость в"},
       {text:"take notice _____",correct:"of",translation:"заметить что-то"}
     ],
-    adjectives: [
+    adjectives:[
       {text:"necessary _____",correct:"for",translation:"необходимый для"},
       {text:"nervous _____",correct:"about",translation:"переживать по поводу чего-то"},
       {text:"new _____",correct:"to",translation:"новенький в/для"}
     ],
-    phrases: [
+    phrases:[
       {text:"in need _____",correct:"of",translation:"в нужде в"},
       {text:"_____ night",correct:"at",translation:"ночью"},
       {text:"_____ the night",correct:"in",translation:"в ночное время"},
@@ -731,19 +888,15 @@ const DB = {
       {text:"in a nutshell",correct:"in",translation:"вкратце",static:true}
     ]
   },
-  O: {
-    verbs: [
+  O:{
+    verbs:[
       {text:"object _____",correct:"to",translation:"возражать против"},
       {text:"occur _____ sb (прийти в голову)",correct:"to",translation:"приходить в голову кому-то"},
       {text:"operate _____ sb",correct:"on",translation:"делать операцию кому-то"}
     ],
-    nouns: [
-      {text:"objection _____",correct:"to",translation:"возражение против"}
-    ],
-    adjectives: [
-      {text:"optimistic _____",correct:"about",translation:"оптимистично настроен насчёт"}
-    ],
-    phrases: [
+    nouns:[{text:"objection _____",correct:"to",translation:"возражение против"}],
+    adjectives:[{text:"optimistic _____",correct:"about",translation:"оптимистично настроен насчёт"}],
+    phrases:[
       {text:"opposite _____",correct:"to",translation:"напротив чего-то"},
       {text:"_____ once",correct:"at",translation:"сразу"},
       {text:"_____ my opinion",correct:"in",translation:"по моему мнению"},
@@ -753,8 +906,8 @@ const DB = {
       {text:"_____ my own",correct:"on",translation:"сам, один"}
     ]
   },
-  S: {
-    verbs: [
+  S:{
+    verbs:[
       {text:"save _____",correct:"from",translation:"спасти от"},
       {text:"search _____",correct:"for",translation:"искать что-то"},
       {text:"seek _____ X",correct:"без предлога",translation:"искать что-то"},
@@ -777,10 +930,8 @@ const DB = {
       {text:"stay up late",correct:"без предлога",translation:"поздно ложиться спать",static:true},
       {text:"smell _____",correct:"of",translation:"пахнуть чем-то"}
     ],
-    nouns: [
-      {text:"solution _____",correct:"to",translation:"решение чего-то"}
-    ],
-    adjectives: [
+    nouns:[{text:"solution _____",correct:"to",translation:"решение чего-то"}],
+    adjectives:[
       {text:"satisfied _____",correct:"with",translation:"доволен чем-то"},
       {text:"scared _____",correct:"of",translation:"напуган чем-то"},
       {text:"sensible _____ (с чьей-то стороны)",correct:"of",translation:"разумно с чьей-то стороны"},
@@ -797,7 +948,7 @@ const DB = {
       {text:"sorry _____",correct:"about",translation:"сожалеть о чём-то"},
       {text:"feel sorry _____ sb",correct:"for",translation:"сочувствовать кому-то"}
     ],
-    phrases: [
+    phrases:[
       {text:"in search _____",correct:"of",translation:"в поиске чего-то"},
       {text:"_____ school",correct:"at",translation:"в школе"},
       {text:"_____ sea",correct:"at",translation:"в плавании"},
@@ -818,8 +969,8 @@ const DB = {
       {text:"_____ scratch",correct:"from",translation:"с нуля"}
     ]
   },
-  T: {
-    verbs: [
+  T:{
+    verbs:[
       {text:"talk _____ sb",correct:"to",translation:"разговаривать с кем-то"},
       {text:"talk to sb _____ sth",correct:"about",translation:"разговаривать о чём-то"},
       {text:"thank sb _____",correct:"for",translation:"благодарить кого-то за"},
@@ -831,14 +982,14 @@ const DB = {
       {text:"translate from ... _____ Y",correct:"into",translation:"переводить на Y"},
       {text:"teach sth _____ sb",correct:"to",translation:"учить чему-то кого-то"}
     ],
-    nouns: [
+    nouns:[
       {text:"talent _____",correct:"for",translation:"талант в чём-то"},
       {text:"taste _____ (вкус в выборе)",correct:"in",translation:"вкус в выборе"},
       {text:"taste _____ (вкус еды)",correct:"of",translation:"вкус еды"},
       {text:"threat _____",correct:"to",translation:"угроза для"},
       {text:"have trouble _____",correct:"with",translation:"проблема с"}
     ],
-    adjectives: [
+    adjectives:[
       {text:"terrible _____",correct:"at",translation:"ужасен в (чём-то)"},
       {text:"terrified _____",correct:"of",translation:"напуган чем-то"},
       {text:"tired _____ (надоело)",correct:"of",translation:"устал от (надоело)"},
@@ -846,7 +997,7 @@ const DB = {
       {text:"typical _____",correct:"of",translation:"типично для"},
       {text:"thankful _____ sb",correct:"to",translation:"благодарен кому-то"}
     ],
-    phrases: [
+    phrases:[
       {text:"thanks _____",correct:"to",translation:"благодаря"},
       {text:"one _____ a time",correct:"at",translation:"по одному за раз"},
       {text:"_____ times",correct:"at",translation:"временами"},
@@ -860,31 +1011,31 @@ const DB = {
       {text:"_____ a trip/tour",correct:"on",translation:"в путешествии"}
     ]
   },
-  U: {
-    nouns: [{text:"make use _____",correct:"of",translation:"воспользоваться чем-то"}],
-    adjectives: [
+  U:{
+    nouns:[{text:"make use _____",correct:"of",translation:"воспользоваться чем-то"}],
+    adjectives:[
       {text:"unaware _____",correct:"of",translation:"не осведомлён о"},
       {text:"upset _____",correct:"about",translation:"расстроен из-за"},
       {text:"used _____",correct:"to",translation:"привык к"}
     ],
-    phrases: [
+    phrases:[
       {text:"_____ university",correct:"at",translation:"в университете"},
       {text:"_____ use",correct:"in",translation:"в пользовании"}
     ]
   },
-  V: {
-    verbs: [{text:"vote _____",correct:"for",translation:"голосовать за"}],
-    nouns: [
+  V:{
+    verbs:[{text:"vote _____",correct:"for",translation:"голосовать за"}],
+    nouns:[
       {text:"pay a visit _____",correct:"to",translation:"навестить кого-то"},
       {text:"a visitor _____",correct:"to",translation:"посетитель чего-то"}
     ],
-    phrases: [
+    phrases:[
       {text:"_____ vain",correct:"in",translation:"напрасно"},
       {text:"_____ a loud voice",correct:"in",translation:"громким голосом"}
     ]
   },
-  W: {
-    verbs: [
+  W:{
+    verbs:[
       {text:"wait _____",correct:"for",translation:"ждать кого-то/что-то"},
       {text:"warn _____",correct:"about / of",translation:"предупреждать о",alternative:true},
       {text:"waste _____",correct:"on",translation:"тратить впустую на"},
@@ -892,12 +1043,12 @@ const DB = {
       {text:"welcome _____",correct:"to",translation:"приветствовать в"},
       {text:"watch _____ X",correct:"без предлога",translation:"наблюдать за чем-то"}
     ],
-    adjectives: [
+    adjectives:[
       {text:"worried _____",correct:"about",translation:"обеспокоен чем-то"},
       {text:"worthy _____",correct:"of",translation:"стоящий чего-то"},
       {text:"worth _____ Ving",correct:"без предлога",translation:"стоит того, чтобы"}
     ],
-    phrases: [
+    phrases:[
       {text:"_____ the weekend",correct:"at",translation:"на выходных"},
       {text:"_____ work",correct:"at",translation:"на работе"},
       {text:"_____ the way (кстати)",correct:"by",translation:"кстати"},
@@ -913,144 +1064,362 @@ const DB = {
   }
 };
 
-/* ============================================================ ПУЛ */
-const POOL=['in','on','at','with','by','for','about','of','to','from','into','up','after','off','under','through'];
-const CAT_L={verbs:'Глагол',nouns:'Существительное',adjectives:'Прилагательное',phrases:'Фраза'};
-const CAT_D={verbs:'Глаголы',nouns:'Существительные',adjectives:'Прилагательные',phrases:'Полезные фразы'};
+/* ================================================================
+   CONSTANTS
+   ================================================================ */
+const POOL = ['in','on','at','with','by','for','about','of','to','from','into','up','after','off','under','through'];
+const CAT_L = {verbs:'Глагол',nouns:'Существительное',adjectives:'Прилагательное',phrases:'Фраза'};
+const CAT_D = {verbs:'Глаголы',nouns:'Существительные',adjectives:'Прилагательные',phrases:'Полезные фразы'};
+const LS_KEY = 'prepmaster_v2';
 
-/* ============================================================ STATE */
-let curLetter='',queue=[],qIdx=0,scC=0,scW=0,streak=0,answered=false;
-
-/* ============================================================ UTILS */
-function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
-function primary(c){return c.split('/')[0].trim()}
-function countWords(l){const s=DB[l];if(!s)return 0;let n=0;Object.values(s).forEach(a=>n+=a.length);return n}
-function buildQueue(l){const s=DB[l]||{};const all=[];['verbs','nouns','adjectives','phrases'].forEach(sec=>{(s[sec]||[]).forEach(it=>all.push({...it,_cat:sec}))});return shuffle(all)}
-function escR(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
-function genOpts(item){
-  const p=primary(item.correct);
-  const isNone=item.correct==='без предлога';
-  const pool=isNone?['без предлога',...POOL]:POOL.filter(x=>x!==p&&x!==item.correct);
-  return shuffle([p,...shuffle(pool).slice(0,4)]);
+/* ================================================================
+   LOCALSTORAGE PERSISTENCE
+   ================================================================ */
+function loadStats() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; }
+}
+function saveStats(s) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch {}
+}
+function getLetterData(l) {
+  const s = loadStats();
+  return s[l] || { bestRecord: null, lastMistakes: [] };
+}
+function setLetterData(l, data) {
+  const s = loadStats();
+  s[l] = data;
+  saveStats(s);
 }
 
-/* ============================================================ NAV */
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
-function goHome(){document.getElementById('result-modal').classList.remove('show');show('s-home')}
-function openDict(){show('s-dict')}
+/* ================================================================
+   THEME
+   ================================================================ */
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-btn').textContent = isDark ? '🌙' : '☀️';
+  buildGrid(); // refresh gradient fills
+}
 
-/* ============================================================ INIT */
-function init(){buildGrid();buildDict()}
-function buildGrid(){
-  const g=document.getElementById('letter-grid');
-  const all='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-  g.innerHTML=all.map(l=>{
-    const n=countWords(l);
-    const has=n>0;
-    return`<button class="letter-btn"${has?` onclick="startQuiz('${l}')"`:" disabled"}>${l}<span class="lcount">${has?n:'—'}</span></button>`;
+/* ================================================================
+   UTILS
+   ================================================================ */
+function shuffle(a) {
+  const b = [...a];
+  for (let i = b.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [b[i], b[j]] = [b[j], b[i]];
+  }
+  return b;
+}
+function primary(c) { return c.split('/')[0].trim(); }
+function countWords(l) {
+  const s = DB[l]; if (!s) return 0;
+  let n = 0; Object.values(s).forEach(a => n += a.length); return n;
+}
+function buildQueue(l) {
+  const s = DB[l] || {}; const all = [];
+  ['verbs','nouns','adjectives','phrases'].forEach(sec => {
+    (s[sec] || []).forEach(it => all.push({...it, _cat: sec}));
+  });
+  return shuffle(all);
+}
+function escR(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function genOpts(item) {
+  const p = primary(item.correct);
+  const isNone = item.correct === 'без предлога';
+  const pool = isNone ? ['без предлога',...POOL] : POOL.filter(x => x !== p && x !== item.correct);
+  return shuffle([p, ...shuffle(pool).slice(0,4)]);
+}
+
+/* ================================================================
+   NAVIGATION
+   ================================================================ */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goHome() {
+  document.getElementById('result-modal').classList.remove('show');
+  show('s-home');
+  buildGrid(); // refresh after possible new record
+}
+function openDict() { show('s-dict'); }
+
+/* ================================================================
+   LETTER GRID — with progress gradient fill
+   ================================================================ */
+function letterBgGradient(l) {
+  const d = getLetterData(l);
+  if (!d.bestRecord) return isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.75)';
+  const total = d.bestRecord.totalCount || 1;
+  const wrong = total - d.bestRecord.correctCount;
+  const wrongPct = Math.round((wrong / total) * 100);
+  const correctPct = 100 - wrongPct;
+  // Red at top (mistakes), green at bottom (correct)
+  return `linear-gradient(to bottom,
+    rgba(239,68,68,0.22) 0%,
+    rgba(239,68,68,0.22) ${wrongPct}%,
+    rgba(34,197,94,0.22) ${wrongPct}%,
+    rgba(34,197,94,0.22) 100%)`;
+}
+
+function buildGrid() {
+  const g = document.getElementById('letter-grid');
+  const all = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  g.innerHTML = all.map(l => {
+    const n = countWords(l);
+    const has = n > 0;
+    const bg = has ? letterBgGradient(l) : (isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.04)');
+    const d = getLetterData(l);
+    const hasBest = d.bestRecord !== null;
+    const score = hasBest ? `${d.bestRecord.correctCount}/${d.bestRecord.totalCount}` : (has ? n : '—');
+    return `<button class="letter-btn"
+      style="background:${bg};background-clip:padding-box;"
+      ${has ? `onclick="startQuiz('${l}')"` : 'disabled'}>
+      <span class="ltext">${l}</span>
+      <span class="lcount">${score}</span>
+    </button>`;
   }).join('');
 }
 
-/* ============================================================ QUIZ */
-function startQuiz(l){
-  curLetter=l;queue=buildQueue(l);qIdx=0;scC=0;scW=0;streak=0;
-  document.getElementById('quiz-badge').textContent=l;
-  updScore();show('s-quiz');nextQ();
+/* ================================================================
+   QUIZ STATE
+   ================================================================ */
+let curLetter = '', queue = [], qIdx = 0;
+let scC = 0, scW = 0, streak = 0, answered = false;
+let roundMistakes = []; // {expression, correct, userAnswer, translation}
+
+function startQuiz(l) {
+  curLetter = l; queue = buildQueue(l); qIdx = 0;
+  scC = 0; scW = 0; streak = 0; roundMistakes = [];
+  document.getElementById('quiz-badge').textContent = l;
+  updScore(); show('s-quiz'); nextQ();
 }
-function restartQuiz(){document.getElementById('result-modal').classList.remove('show');startQuiz(curLetter)}
-function nextQ(){
-  if(qIdx>=queue.length){showResult();return}
-  answered=false;
-  document.getElementById('next-btn').classList.remove('show');
-  const item=queue[qIdx];
-  const pct=Math.round((qIdx/queue.length)*100);
-  document.getElementById('progress-fill').style.width=pct+'%';
-  document.getElementById('progress-label').textContent=`${qIdx+1} / ${queue.length}`;
-  document.getElementById('q-cat').textContent=CAT_L[item._cat]||'Слово';
-  document.getElementById('q-word').innerHTML=item.text.replace(/_{3,}/g,'<span class="q-blank">_____</span>');
-  document.getElementById('q-hint').textContent=item.translation||'';
-  renderOpts(item);
-}
-function renderOpts(item){
-  const opts=genOpts(item);
-  document.getElementById('answers-grid').innerHTML=opts.map(o=>
-    `<button class="ans-btn" onclick="checkAns(this,'${o.replace(/'/g,"\\'")}','${primary(item.correct).replace(/'/g,"\\'")}')"> ${o}</button>`
-  ).join('');
-}
-function checkAns(btn,sel,corr){
-  if(answered)return;answered=true;
-  document.querySelectorAll('.ans-btn').forEach(b=>b.disabled=true);
-  if(sel===corr){
-    btn.classList.add('correct');scC++;streak++;updScore();qIdx++;
-    setTimeout(nextQ,1100);
-  } else {
-    btn.classList.add('wrong');scW++;streak=0;updScore();
-    document.querySelectorAll('.ans-btn').forEach(b=>{if(b.textContent.trim()===corr)b.classList.add('correct')});
-    qIdx++;document.getElementById('next-btn').classList.add('show');
-  }
-}
-function updScore(){
-  document.getElementById('sc-c').textContent=scC;
-  document.getElementById('sc-w').textContent=scW;
-  document.getElementById('sc-s').textContent=streak;
+function restartQuiz() {
+  document.getElementById('result-modal').classList.remove('show');
+  startQuiz(curLetter);
 }
 
-/* ============================================================ RESULTS */
-function showResult(){
-  const total=queue.length;
-  const pct=total?Math.round((scC/total)*100):0;
-  const icon=pct>=90?'🏆':pct>=70?'🎯':pct>=50?'👍':'💪';
-  const msg=pct>=90?'Превосходный результат! Ты настоящий мастер предлогов.':
-            pct>=70?'Хороший результат! Ещё немного — и будет идеально.':
-            pct>=50?'Неплохо, но есть над чем поработать. Попробуй ещё раз!':
-                    'Продолжай тренироваться — результат обязательно вырастет!';
-  document.getElementById('modal-icon').textContent=icon;
-  document.getElementById('modal-letter').textContent='Буква '+curLetter;
-  document.getElementById('m-total').textContent=total;
-  document.getElementById('m-pct').textContent=pct+'%';
-  document.getElementById('m-right').textContent=scC;
-  document.getElementById('m-wrong').textContent=scW;
-  document.getElementById('modal-msg').textContent=msg;
+function nextQ() {
+  if (qIdx >= queue.length) { showResult(); return; }
+  answered = false;
+  document.getElementById('next-btn').classList.remove('show');
+  const item = queue[qIdx];
+  const pct = Math.round((qIdx / queue.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${qIdx+1} / ${queue.length}`;
+  document.getElementById('q-cat').textContent = CAT_L[item._cat] || 'Слово';
+  document.getElementById('q-word').innerHTML = item.text.replace(/_{3,}/g,'<span class="q-blank">_____</span>');
+  document.getElementById('q-hint').textContent = item.translation || '';
+  renderOpts(item);
+}
+
+function renderOpts(item) {
+  const opts = genOpts(item);
+  document.getElementById('answers-grid').innerHTML = opts.map(o =>
+    `<button class="ans-btn" onclick="checkAns(this,'${o.replace(/'/g,"\\'")}','${primary(item.correct).replace(/'/g,"\\'")}','${item.text.replace(/'/g,"\\'").replace(/"/g,"&quot;")}','${item.translation.replace(/'/g,"\\'").replace(/"/g,"&quot;")}')"> ${o}</button>`
+  ).join('');
+}
+
+function checkAns(btn, sel, corr, expr, tr) {
+  if (answered) return; answered = true;
+  document.querySelectorAll('.ans-btn').forEach(b => b.disabled = true);
+  if (sel === corr) {
+    btn.classList.add('correct'); scC++; streak++; updScore(); qIdx++;
+    setTimeout(nextQ, 1100);
+  } else {
+    btn.classList.add('wrong'); scW++; streak = 0; updScore();
+    document.querySelectorAll('.ans-btn').forEach(b => {
+      if (b.textContent.trim() === corr) b.classList.add('correct');
+    });
+    roundMistakes.push({ expression: expr, correct: corr, userAnswer: sel, translation: tr });
+    qIdx++;
+    document.getElementById('next-btn').classList.add('show');
+  }
+}
+
+function updScore() {
+  document.getElementById('sc-c').textContent = scC;
+  document.getElementById('sc-w').textContent = scW;
+  document.getElementById('sc-s').textContent = streak;
+}
+
+/* ================================================================
+   RESULTS
+   ================================================================ */
+function showResult() {
+  const total = queue.length;
+  const pct = total ? Math.round((scC / total) * 100) : 0;
+  const icon = pct >= 90 ? '🏆' : pct >= 70 ? '🎯' : pct >= 50 ? '👍' : '💪';
+  const msg = pct >= 90 ? 'Превосходный результат! Ты настоящий мастер предлогов.' :
+              pct >= 70 ? 'Хороший результат! Ещё немного — и будет идеально.' :
+              pct >= 50 ? 'Неплохо, но есть над чем поработать. Попробуй ещё раз!' :
+                          'Продолжай тренироваться — результат обязательно вырастет!';
+
+  document.getElementById('modal-icon').textContent = icon;
+  document.getElementById('modal-letter').textContent = 'Буква ' + curLetter;
+  document.getElementById('m-total').textContent = total;
+  document.getElementById('m-pct').textContent = pct + '%';
+  document.getElementById('m-right').textContent = scC;
+  document.getElementById('m-wrong').textContent = scW;
+  document.getElementById('modal-msg').textContent = msg;
+
+  // Render mistakes list
+  const sec = document.getElementById('modal-mistakes-section');
+  if (roundMistakes.length > 0) {
+    sec.innerHTML = `<div class="modal-mistakes-title">❌ Ошибки этого раунда (${roundMistakes.length})</div>` +
+      roundMistakes.map(m => `
+        <div class="modal-mistake-item">
+          <div class="mmi-top">
+            <span class="mmi-expr">${m.expression.replace(/_{3,}/g,'_____')}</span>
+            <span class="mmi-correct">✓ ${m.correct}</span>
+            <span class="mmi-wrong-ans">✗ ${m.userAnswer}</span>
+          </div>
+          <div class="mmi-tr">${m.translation}</div>
+        </div>`).join('');
+  } else {
+    sec.innerHTML = `<div style="text-align:center;color:var(--correct);font-weight:600;margin-bottom:1.2rem;font-size:.95rem;">✨ Ошибок нет — идеальный результат!</div>`;
+  }
+
+  // Persist to localStorage
+  const prev = getLetterData(curLetter);
+  const newBest = (!prev.bestRecord || scC > prev.bestRecord.correctCount)
+    ? { correctCount: scC, totalCount: total } : prev.bestRecord;
+  setLetterData(curLetter, { bestRecord: newBest, lastMistakes: roundMistakes });
+
   document.getElementById('result-modal').classList.add('show');
 }
 
-/* ============================================================ DICT */
-function buildDict(){
-  const container=document.getElementById('dict-content');
-  container.innerHTML=Object.keys(DB).sort().map(l=>{
-    const secs=DB[l];
-    const body=['verbs','nouns','adjectives','phrases'].map(sec=>{
-      const items=secs[sec];
-      if(!items||!items.length)return'';
-      return`<p class="dict-cat-heading">${CAT_D[sec]}</p>
-             <div class="dict-entries">${items.map(dictEntry).join('')}</div>`;
+/* ================================================================
+   DICTIONARY
+   ================================================================ */
+function buildDict() {
+  const container = document.getElementById('dict-content');
+  container.innerHTML = Object.keys(DB).sort().map(l => {
+    const secs = DB[l];
+    const body = ['verbs','nouns','adjectives','phrases'].map(sec => {
+      const items = secs[sec];
+      if (!items || !items.length) return '';
+      return `<p class="dict-cat-heading">${CAT_D[sec]}</p>
+              <div class="dict-entries">${items.map(dictEntry).join('')}</div>`;
     }).join('');
-    return`<div class="dict-letter-block">
+    return `<div class="dict-letter-block">
       <div class="dict-letter-heading">Буква ${l}</div>${body}
     </div>`;
   }).join('');
 }
-function dictEntry(item){
-  let phrase=item.text;
-  if(item.static){
-    const p=item.correct;
-    if(p!=='без предлога')
-      phrase=phrase.replace(new RegExp('\\b('+escR(p)+')\\b','i'),'<span class="hp">$1</span>');
-  } else if(item.correct==='без предлога'){
-    phrase=phrase.replace(/_{3,}/g,'<span class="hp">∅</span>');
+
+function dictEntry(item) {
+  let phrase = item.text;
+  if (item.static) {
+    const p = item.correct;
+    if (p !== 'без предлога')
+      phrase = phrase.replace(new RegExp('\\b('+escR(p)+')\\b','i'),'<span class="hp">$1</span>');
+  } else if (item.correct === 'без предлога') {
+    phrase = phrase.replace(/_{3,}/g,'<span class="hp">∅</span>');
   } else {
-    const preps=item.correct.split('/').map(p=>p.trim());
-    let first=true;
-    phrase=phrase.replace(/_{3,}/g,()=>{
-      const tag=preps.map(p=>`<span class="hp">${p}</span>`).join(' / ');
-      if(first){first=false;return tag}
+    const preps = item.correct.split('/').map(p => p.trim());
+    let first = true;
+    phrase = phrase.replace(/_{3,}/g, () => {
+      const tag = preps.map(p => `<span class="hp">${p}</span>`).join(' / ');
+      if (first) { first = false; return tag; }
       return tag;
     });
   }
-  return`<div class="dict-entry">
+  return `<div class="dict-entry">
     <span class="dict-entry-phrase">${phrase}</span>
-    <span class="dict-entry-tr">${item.translation||''}</span>
+    <span class="dict-entry-tr">${item.translation || ''}</span>
   </div>`;
+}
+
+/* ================================================================
+   DICTIONARY SCROLL-TO-HIDE HEADER
+   ================================================================ */
+let lastScrollY = 0;
+function initDictScroll() {
+  // We listen on window scroll while dict screen is active
+  window.addEventListener('scroll', () => {
+    const dictScreen = document.getElementById('s-dict');
+    if (!dictScreen.classList.contains('active')) return;
+    const topbar = document.getElementById('dict-topbar');
+    const current = window.scrollY;
+    if (current > lastScrollY && current > 60) {
+      topbar.classList.add('hidden-header');
+    } else {
+      topbar.classList.remove('hidden-header');
+    }
+    lastScrollY = current;
+  }, { passive: true });
+}
+
+/* ================================================================
+   ANALYTICS CENTER
+   ================================================================ */
+function openAnalytics() {
+  buildAnalyticsGrid();
+  document.getElementById('analytics-overlay').classList.add('show');
+  document.getElementById('analytics-drilldown').innerHTML = '';
+}
+function closeAnalytics() {
+  document.getElementById('analytics-overlay').classList.remove('show');
+}
+
+function buildAnalyticsGrid() {
+  const all = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const grid = document.getElementById('analytics-grid');
+  grid.innerHTML = all.map(l => {
+    const n = countWords(l);
+    const has = n > 0;
+    if (!has) return `<button class="ana-letter-btn" disabled>${l}<span class="ana-count">—</span></button>`;
+    const d = getLetterData(l);
+    const hasMistakes = d.lastMistakes && d.lastMistakes.length > 0;
+    const mistakeCount = hasMistakes ? d.lastMistakes.length : 0;
+    return `<button class="ana-letter-btn${hasMistakes?' has-mistakes':''}"
+      onclick="showLetterMistakes('${l}')">
+      ${l}<span class="ana-count">${hasMistakes?`${mistakeCount}❌`:'✓'}</span>
+    </button>`;
+  }).join('');
+}
+
+function showLetterMistakes(l) {
+  const d = getLetterData(l);
+  const dd = document.getElementById('analytics-drilldown');
+  const mistakes = d.lastMistakes || [];
+
+  if (mistakes.length === 0) {
+    dd.innerHTML = `<div class="ana-drilldown">
+      <div class="ana-drilldown-title">Буква ${l}</div>
+      <div class="ana-no-mistakes">✅ Ошибок нет — отличная работа!</div>
+    </div>`;
+    return;
+  }
+
+  dd.innerHTML = `<div class="ana-drilldown">
+    <div class="ana-drilldown-title">Буква ${l} — ${mistakes.length} ошибок</div>
+    ${mistakes.map(m => `
+      <div class="ana-mistake-row">
+        <div class="ana-row-top">
+          <span class="ana-expr">${m.expression.replace(/_{3,}/g,'_____')}</span>
+          <span class="ana-badge correct">✓ ${m.correct}</span>
+          <span class="ana-badge wrong">✗ ${m.userAnswer}</span>
+        </div>
+        <div class="ana-tr">${m.translation}</div>
+      </div>`).join('')}
+  </div>`;
+
+  // Smooth scroll to drilldown
+  setTimeout(() => dd.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+function init() {
+  buildGrid();
+  buildDict();
+  initDictScroll();
 }
 
 init();
